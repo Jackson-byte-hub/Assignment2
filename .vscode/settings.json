@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.dbclient-js": "javascript",
+        "iostream": "cpp",
+        "iomanip": "cpp",
+        "sstream": "cpp",
+        "new": "cpp",
+        "__bit_reference": "cpp",
+        "ios": "cpp"
+    }
+}

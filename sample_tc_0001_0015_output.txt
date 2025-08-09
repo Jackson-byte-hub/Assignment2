@@ -1,0 +1,125 @@
+----- Sample Testcase 01 -----
+Cell_1 [type=0,req_dmg=0]
+
+----- Sample Testcase 02 -----
+Cell_1 [type=0,req_dmg=0]
+Cell_2 [type=2,req_dmg=100]
+0
+
+----- Sample Testcase 03 -----
+15
+5
+
+----- Sample Testcase 04 -----
+(0,0)
+
+----- Sample Testcase 05 -----
+FlyTeam1[index=0;pos=(1,1);moving_rule=RRDD]
+
+----- Sample Testcase 06 -----
+FlyTeam1[damage=900,HP=500]
+FlyTeam1[index=0;pos=(1,1);moving_rule=RRDD]
+
+----- Sample Testcase 07 -----
+Initial positions:
+(0,0)
+After first move:
+(0,1)
+After second move:
+(0,2)
+Final Information
+FlyTeam1[index=1;pos=(0,2);moving_rule=R]
+
+----- Sample Testcase 08 -----
+Initial positions:
+(0,0)
+After first move:
+(1,0)
+After second move:
+(2,0)
+Final Information
+FlyTeam1[index=1;pos=(2,0);moving_rule=RDDUL]
+
+----- Sample Testcase 09 -----
+Initial positions:
+FlyTeam1[index=1;pos=(0,0);moving_rule=RD]
+GroundTeam[index=2;pos=(9,9);moving_rule=UL]
+After first move:
+FlyTeam1[index=1;pos=(1,1);moving_rule=RD]
+GroundTeam[index=2;pos=(8,8);moving_rule=UL]
+After second move:
+FlyTeam1[index=1;pos=(2,2);moving_rule=RD]
+GroundTeam[index=2;pos=(7,7);moving_rule=UL]
+
+----- Sample Testcase 10 -----
+Initial positions:
+FlyTeam1: FlyTeam1[index=1;pos=(1,1);moving_rule=RRRR]
+FlyTeam2: FlyTeam2[index=2;pos=(5,5);moving_rule=LLLL]
+DragonLord: DragonLord[index=0;pos=(3,3)]
+After moving:
+FlyTeam1: FlyTeam1[index=1;pos=(1,5);moving_rule=RRRR]
+FlyTeam2: FlyTeam2[index=2;pos=(5,1);moving_rule=LLLL]
+DragonLord: DragonLord[index=0;pos=(4,4)]
+
+----- Sample Testcase 11 -----
+300
+Configuration[
+MAP_NUM_ROWS=10
+MAP_NUM_COLS=10
+MAX_NUM_MOVING_OBJECTS=10
+NUM_OBSTACLE=3
+ARRAY_OBSTACLE=[(1,2);(3,4);(5,6)]
+NUM_GROUND_OBSTACLE=2
+ARRAY_GROUND_OBSTACLE=[(2,1);(4,3)]
+FLYTEAM1_MOVING_RULE=RRD
+FLYTEAM1_INIT_POS=(0,0)
+FLYTEAM1_INIT_HP=300
+FLYTEAM1_INIT_EXP=200
+FLYTEAM2_MOVING_RULE=DDR
+FLYTEAM2_INIT_POS=(9,9)
+FLYTEAM2_INIT_HP=300
+FLYTEAM2_INIT_EXP=200
+GROUNDTEAM_MOVING_RULE=ULU
+GROUNDTEAM_INIT_POS=(5,5)
+GROUNDTEAM_INIT_HP=400
+GROUNDTEAM_INIT_EXP=150
+DRAGONLORD_INIT_POS=(7,7)
+NUM_STEPS=20
+]
+
+----- Sample Testcase 12 -----
+Configuration[
+MAP_NUM_ROWS=10
+MAP_NUM_COLS=10
+MAX_NUM_MOVING_OBJECTS=10
+NUM_OBSTACLE=0
+ARRAY_OBSTACLE=[]
+NUM_GROUND_OBSTACLE=0
+ARRAY_GROUND_OBSTACLE=[]
+FLYTEAM1_MOVING_RULE=RRD
+FLYTEAM1_INIT_POS=(0,0)
+FLYTEAM1_INIT_HP=0
+FLYTEAM1_INIT_EXP=0
+FLYTEAM2_MOVING_RULE=DDR
+FLYTEAM2_INIT_POS=(9,9)
+FLYTEAM2_INIT_HP=0
+FLYTEAM2_INIT_EXP=0
+GROUNDTEAM_MOVING_RULE=ULU
+GROUNDTEAM_INIT_POS=(5,5)
+GROUNDTEAM_INIT_HP=0
+GROUNDTEAM_INIT_EXP=0
+DRAGONLORD_INIT_POS=(7,7)
+NUM_STEPS=20
+]
+
+----- Sample Testcase 13 -----
+10
+10
+
+----- Sample Testcase 14 -----
+300
+300
+
+----- Sample Testcase 15 -----
+FlyTeam1[index=1;pos=(0,0);moving_rule=RRD]
+FlyTeam2[index=2;pos=(9,9);moving_rule=DDR]
