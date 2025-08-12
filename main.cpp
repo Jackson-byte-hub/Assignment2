@@ -122,6 +122,6 @@ static void satc_0001() {
 }
 
 int main(int argc, const char * argv[]) {
-    TestDragonWar::satc_0001();
+    test();
     return 0;
 }

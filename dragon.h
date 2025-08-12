@@ -259,7 +259,6 @@ public:
     string str() const;
     // TODO
     // Getters
-    int getNumSteps() const;
     int getMapRows() const;
     int getMapCols() const;
     int getNumObstacles() const;
@@ -267,21 +266,23 @@ public:
     const Position* getObstacles() const;
     const Position* getGroundObstacles() const;
 
-    const Position& getFlyTeam1Pos() const;
     const string& getFlyTeam1Rule() const;
+    const Position& getFlyTeam1Pos() const;
     int getFlyTeam1HP() const;
-    int getFlyTeam1Damage() const;
+    int getFlyTeam1DMG() const;
 
-    const Position& getFlyTeam2Pos() const;
     const string& getFlyTeam2Rule() const;
+    const Position& getFlyTeam2Pos() const;
     int getFlyTeam2HP() const;
-    int getFlyTeam2Damage() const;
+    int getFlyTeam2DMG() const;
 
-    const Position& getGroundTeamPos() const;
     const string& getGroundTeamRule() const;
+    const Position& getGroundTeamPos() const;
     int getGroundTeamHP() const;
-    int getGroundTeamDamage() const;
+    int getGroundTeamDMG() const;
     int getGroundTeamTrapTurns() const;
+
+    int getNumSteps() const;
 };
 
 // ——— DragonWarriorsProgram ———

@@ -62,7 +62,6 @@ bool Position::operator!=(const Position& other) const {
 
 MapElement::MapElement(ElementType t, int r) {
     type = t;
-
     if (t == GROUND_OBSTACLE) {
         // r here is treated as encoded (see Map class will pass calculated req_dmg)
         req_dmg = r;
@@ -443,6 +442,175 @@ string ArrayMovingObject::str() const {
     return result;
 }
 
+////////////////////////////////////////////////////////////////////////
+/// CONFIGURATION
+////////////////////////////////////////////////////////////////////////
+
+Configuration::Configuration(const string &filepath) {
+    // Default values
+    map_num_rows = map_num_cols = 0;
+    num_obstacles = num_ground_obstacles = 0;
+    arr_obstacles = nullptr;
+    arr_ground_obstacles = nullptr;
+    flyteam1_hp = flyteam1_dmg = 0;
+    flyteam2_hp = flyteam2_dmg = 0;
+    groundteam_hp = groundteam_dmg = groundteam_trap_turns = 0;
+    num_steps = 0;
+
+    ifstream fin(filepath.c_str());
+    if (!fin.is_open()) {
+        cerr << "Cannot open config file: " << filepath << endl;
+        return;
+    }
+
+    string line;
+    while (getline(fin, line)) {
+        // Remove spaces manually (legal version)
+        string cleanLine = "";
+        for (size_t i = 0; i < line.length(); ++i) {
+            char c = line[i];
+            if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+                cleanLine += c;
+            }
+        }
+        if (cleanLine.empty()) continue;
+
+        // Find '='
+        size_t eqPos = cleanLine.find('=');
+        if (eqPos == string::npos) continue;
+
+        string key = cleanLine.substr(0, eqPos);
+        string val = cleanLine.substr(eqPos + 1);
+
+        if (key == "MAP_NUM_ROWS") map_num_rows = atoi(val.c_str());
+        else if (key == "MAP_NUM_COLS") map_num_cols = atoi(val.c_str());
+        else if (key == "NUM_OBSTACLE") num_obstacles = atoi(val.c_str());
+        else if (key == "ARRAY_OBSTACLE") {
+            if (num_obstacles > 0) {
+                arr_obstacles = new Position[num_obstacles];
+                string content = val.substr(1, val.size() - 2); // remove []
+                int idx = 0;
+                size_t start = 0;
+                while (start < content.size() && idx < num_obstacles) {
+                    size_t sep = content.find(';', start);
+                    if (sep == string::npos) sep = content.size();
+                    arr_obstacles[idx++] = Position(content.substr(start, sep - start));
+                    start = sep + 1;
+                }
+            }
+        }
+        else if (key == "NUM_GROUND_OBSTACLE") num_ground_obstacles = atoi(val.c_str());
+        else if (key == "ARRAY_GROUND_OBSTACLE") {
+            if (num_ground_obstacles > 0) {
+                arr_ground_obstacles = new Position[num_ground_obstacles];
+                string content = val.substr(1, val.size() - 2); // remove []
+                int idx = 0;
+                size_t start = 0;
+                while (start < content.size() && idx < num_ground_obstacles) {
+                    size_t sep = content.find(';', start);
+                    if (sep == string::npos) sep = content.size();
+                    arr_ground_obstacles[idx++] = Position(content.substr(start, sep - start));
+                    start = sep + 1;
+                }
+            }
+        }
+        else if (key == "FLYTEAM1_MOVING_RULE") flyteam1_rule = val;
+        else if (key == "FLYTEAM1_INIT_POS") flyteam1_init_pos = Position(val);
+        else if (key == "FLYTEAM1_INIT_HP") flyteam1_hp = atoi(val.c_str());
+        else if (key == "FLYTEAM1_INIT_DMG") flyteam1_dmg = atoi(val.c_str());
+
+        else if (key == "FLYTEAM2_MOVING_RULE") flyteam2_rule = val;
+        else if (key == "FLYTEAM2_INIT_POS") flyteam2_init_pos = Position(val);
+        else if (key == "FLYTEAM2_INIT_HP") flyteam2_hp = atoi(val.c_str());
+        else if (key == "FLYTEAM2_INIT_DMG") flyteam2_dmg = atoi(val.c_str());
+
+        else if (key == "GROUNDTEAM_MOVING_RULE") groundteam_rule = val;
+        else if (key == "GROUNDTEAM_INIT_POS") groundteam_init_pos = Position(val);
+        else if (key == "GROUNDTEAM_INIT_HP") groundteam_hp = atoi(val.c_str());
+        else if (key == "GROUNDTEAM_INIT_DMG") groundteam_dmg = atoi(val.c_str());
+        else if (key == "GROUNDTEAM_TRAP_TURNS") groundteam_trap_turns = atoi(val.c_str());
+
+        else if (key == "NUM_STEPS") num_steps = atoi(val.c_str());
+    }
+
+    fin.close();
+}
+
+Configuration::~Configuration() {
+    if (arr_obstacles) delete[] arr_obstacles;
+    if (arr_ground_obstacles) delete[] arr_ground_obstacles;
+}
+
+string Configuration::str() const {
+    stringstream ss;
+    ss << "Configuration[" << "\n";
+
+    ss << "MAP_NUM_ROWS=" << map_num_rows << "\n";
+    ss << "MAP_NUM_COLS=" << map_num_cols << "\n";
+    ss << "NUM_OBSTACLE=" << num_obstacles << "\n";
+
+    ss << "ARRAY_OBSTACLE=[";
+    for (int i = 0; i < num_obstacles; i++) {
+        ss << arr_obstacles[i].str();
+        if (i != num_obstacles - 1) ss << ";";
+    }
+    ss << "]\n";
+
+    ss << "NUM_GROUND_OBSTACLE=" << num_ground_obstacles << "\n";
+    ss << "ARRAY_GROUND_OBSTACLE=[";
+    for (int i = 0; i < num_ground_obstacles; i++) {
+        ss << arr_ground_obstacles[i].str();
+        if (i != num_ground_obstacles - 1) ss << ";";
+    }
+    ss << "]\n";
+
+    ss << "FLYTEAM1_MOVING_RULE=" << flyteam1_rule << "\n";
+    ss << "FLYTEAM1_INIT_POS=" << flyteam1_init_pos.str() << "\n";
+    ss << "FLYTEAM1_INIT_HP=" << flyteam1_hp << "\n";
+    ss << "FLYTEAM1_INIT_DMG=" << flyteam1_dmg << "\n";
+
+    ss << "FLYTEAM2_MOVING_RULE=" << flyteam2_rule << "\n";
+    ss << "FLYTEAM2_INIT_POS=" << flyteam2_init_pos.str() << "\n";
+    ss << "FLYTEAM2_INIT_HP=" << flyteam2_hp << "\n";
+    ss << "FLYTEAM2_INIT_DMG=" << flyteam2_dmg << "\n";
+
+    ss << "GROUNDTEAM_MOVING_RULE=" << groundteam_rule << "\n";
+    ss << "GROUNDTEAM_INIT_POS=" << groundteam_init_pos.str() << "\n";
+    ss << "GROUNDTEAM_INIT_HP=" << groundteam_hp << "\n";
+    ss << "GROUNDTEAM_INIT_DMG=" << groundteam_dmg << "\n";
+    ss << "GROUNDTEAM_TRAP_TURNS=" << groundteam_trap_turns << "\n";
+
+    ss << "NUM_STEPS=" << num_steps << "\n";
+    ss << "]";
+    return ss.str();
+}
+
+
+//GETTERS
+int Configuration::getMapRows() const { return map_num_rows; }
+int Configuration::getMapCols() const { return map_num_cols; }
+int Configuration::getNumObstacles() const { return num_obstacles; }
+int Configuration::getNumGroundObstacles() const { return num_ground_obstacles; }
+const Position* Configuration::getObstacles() const { return arr_obstacles; }
+const Position* Configuration::getGroundObstacles() const { return arr_ground_obstacles; }
+
+const string& Configuration::getFlyTeam1Rule() const { return flyteam1_rule; }
+const Position& Configuration::getFlyTeam1Pos() const { return flyteam1_init_pos; }
+int Configuration::getFlyTeam1HP() const { return flyteam1_hp; }
+int Configuration::getFlyTeam1DMG() const { return flyteam1_dmg; }
+
+const string& Configuration::getFlyTeam2Rule() const { return flyteam2_rule; }
+const Position& Configuration::getFlyTeam2Pos() const { return flyteam2_init_pos; }
+int Configuration::getFlyTeam2HP() const { return flyteam2_hp; }
+int Configuration::getFlyTeam2DMG() const { return flyteam2_dmg; }
+
+const string& Configuration::getGroundTeamRule() const { return groundteam_rule; }
+const Position& Configuration::getGroundTeamPos() const { return groundteam_init_pos; }
+int Configuration::getGroundTeamHP() const { return groundteam_hp; }
+int Configuration::getGroundTeamDMG() const { return groundteam_dmg; }
+int Configuration::getGroundTeamTrapTurns() const { return groundteam_trap_turns; }
+
+int Configuration::getNumSteps() const { return num_steps; }
 
 
 ////////////////////////////////////////////////
