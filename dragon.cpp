@@ -307,7 +307,7 @@ void GroundTeam::move() {
 string GroundTeam::str() const {
     return "GroundTeam[index=" + to_string(index) +
            ";pos=" + pos.str() +
-           ";rule=" + moving_rule +"]";
+           ";moving_rule=" + moving_rule +"]";
 }
 bool GroundTeam::trap(DragonLord* dragon) {
     // Check if on same tile
@@ -567,18 +567,18 @@ string Configuration::str() const {
     ss << "FLYTEAM1_MOVING_RULE=" << flyteam1_rule << "\n";
     ss << "FLYTEAM1_INIT_POS=" << flyteam1_init_pos.str() << "\n";
     ss << "FLYTEAM1_INIT_HP=" << flyteam1_hp << "\n";
-    ss << "FLYTEAM1_INIT_DMG=" << flyteam1_dmg << "\n";
+    ss << "FLYTEAM1_INIT_DAMAGE=" << flyteam1_dmg << "\n";
 
     ss << "FLYTEAM2_MOVING_RULE=" << flyteam2_rule << "\n";
     ss << "FLYTEAM2_INIT_POS=" << flyteam2_init_pos.str() << "\n";
     ss << "FLYTEAM2_INIT_HP=" << flyteam2_hp << "\n";
-    ss << "FLYTEAM2_INIT_DMG=" << flyteam2_dmg << "\n";
+    ss << "FLYTEAM2_INIT_DAMAGE=" << flyteam2_dmg << "\n";
 
     ss << "GROUNDTEAM_MOVING_RULE=" << groundteam_rule << "\n";
     ss << "GROUNDTEAM_INIT_POS=" << groundteam_init_pos.str() << "\n";
     ss << "GROUNDTEAM_INIT_HP=" << groundteam_hp << "\n";
-    ss << "GROUNDTEAM_INIT_DMG=" << groundteam_dmg << "\n";
-    ss << "GROUNDTEAM_TRAP_TURNS=" << groundteam_trap_turns << "\n";
+    ss << "GROUNDTEAM_INIT_DAMAGE=" << groundteam_dmg << "\n";
+    // ss << "DRAGONLORD_INIT_POS=" << dragonlord_init_pos.str() << "\n";
 
     ss << "NUM_STEPS=" << num_steps << "\n";
     ss << "]";
