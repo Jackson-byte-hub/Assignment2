@@ -54,12 +54,16 @@ public:
     static const Position npos;
     Position(int r = 0, int c = 0);
     Position(const string &str_pos);
+
     int     getRow()  const;
     int     getCol()  const;
     void    setRow(int r);
     void    setCol(int c);
     string  str()     const;
     bool    isEqual(int in_r, int in_c) const;
+    bool isEqual(const Position &other) const {
+        return r_ == other.r_ && c_ == other.c_;
+    }
     bool operator==(const Position& other) const;
     bool operator!=(const Position& other) const;
 };
@@ -124,16 +128,16 @@ public:
     virtual ~Warrior();
     // TODO
     // getter and setter
-    int getHP() const;
+    int getHp() const;
     int getDamage() const;
-    void setHP(int hp);
+    void setHp(int hp);
     void setDamage(int dmg);
     // getBag()
     BaseBag* getBag() const;
 
 };
 
-// ——— FlyTeam & GroundTeam ———
+// ——— FlyTeam  ———
 class FlyTeam : public Warrior {
 private:
     // TODO
@@ -153,6 +157,7 @@ public:
 
 };
 
+// ——— GroundTeam  ———
 class GroundTeam : public Warrior {
 private:
     // TODO
@@ -182,10 +187,10 @@ private:
     // TODO
     int hp;
     int trapped_counter;
-    FlyTeam* flyteam1;
-    FlyTeam* flyteam2;
     GroundTeam* groundteam;
 public:
+    FlyTeam* flyteam1;
+    FlyTeam* flyteam2;
     DragonLord(int index, const Position & pos, Map * map,
                FlyTeam *flyteam1, FlyTeam *flyteam2, GroundTeam * groundteam);
     // TODO
@@ -196,8 +201,8 @@ public:
     // str
     string str() const override;
     void setTrapped(int turns);
-    void setHP(int hp);
-    int getHP() const;
+    void setHp(int hp);
+    int getHp() const;
 };
 
 // ...................
@@ -221,6 +226,9 @@ public:
     bool isFull() const;
     bool add(MovingObject* mv_obj);
     string str() const;
+    int size() const { return count; }  // assuming count is element counter
+    MovingObject* get(int index) const { return arr_mv_objs[index]; } // assuming arr holds pointers
+
 };
 
 // ——— Configuration ———
@@ -259,8 +267,8 @@ public:
     string str() const;
     // TODO
     // Getters
-    int getMapRows() const;
-    int getMapCols() const;
+    int getMapNumRows() const;
+    int getMapNumCols() const;
     int getNumObstacles() const;
     int getNumGroundObstacles() const;
     const Position* getObstacles() const;
@@ -268,12 +276,12 @@ public:
 
     const string& getFlyTeam1Rule() const;
     const Position& getFlyTeam1Pos() const;
-    int getFlyTeam1HP() const;
+    int getFlyTeam1InitHP() const;
     int getFlyTeam1DMG() const;
 
     const string& getFlyTeam2Rule() const;
     const Position& getFlyTeam2Pos() const;
-    int getFlyTeam2HP() const;
+    int getFlyTeam2InitHP() const;
     int getFlyTeam2DMG() const;
 
     const string& getGroundTeamRule() const;
@@ -304,7 +312,8 @@ public:
     DragonWarriorsProgram(const string &config_file_path);
     
     bool   isStop() const;
-
+    FlyTeam* getFlyTeam1() const { return flyteam1; }
+    FlyTeam* getFlyTeam2() const { return flyteam2; }
     void printResult() const {
         if (flyteam1->getCurrentPosition().isEqual(dragonlord->getCurrentPosition())) {
             cout << "FlyTeam1 defeated the DragonLord!" << endl;
@@ -326,7 +335,7 @@ public:
     void run(bool verbose) {
         // Note: This is a sample code. You can change the implementation as you like.
         // TODO
-        for (int istep = 0; istep < config->num_steps; ++istep) {
+        for (int istep = 0; istep < config->getNumSteps(); ++istep) {
             for (int i = 0; i < arr_mv_objs->size(); ++i) {
                 arr_mv_objs->get(i)->move();
                 if (isStop()) {

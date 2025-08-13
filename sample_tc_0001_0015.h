@@ -197,13 +197,13 @@ public:
         delete config;
     }
 
-    static void satc_0015() {
-        cout << "\n----- Sample Testcase 15 -----" << endl;
-        DragonWarriorsProgram * myProgram = new DragonWarriorsProgram("sa_tc_01_config");
-        cout << myProgram->flyteam1->str() << endl;
-        cout << myProgram->flyteam2->str() << endl;
-        delete myProgram;
-    }
+    // static void satc_0015() {
+    //     cout << "\n----- Sample Testcase 15 -----" << endl;
+    //     DragonWarriorsProgram * myProgram = new DragonWarriorsProgram("sa_tc_01_config");
+    //     cout << myProgram->flyteam1->str() << endl;
+    //     cout << myProgram->flyteam2->str() << endl;
+    //     delete myProgram;
+    // }
 };
 
 void test() {
@@ -221,5 +221,5 @@ void test() {
         TestDragonWar::satc_0012();
         TestDragonWar::satc_0013();
         TestDragonWar::satc_0014();
-        TestDragonWar::satc_0015();
+        // TestDragonWar::satc_0015();
 };

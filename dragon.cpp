@@ -189,18 +189,18 @@ Warrior::Warrior(int index, const Position &pos, Map *map, const string &name, i
 : MovingObject(index, pos, map, name) {
     this->hp = max(0, min(hp, 500));       // HP [0, 500]
     this->damage = max(0, min(damage, 900)); // DMG [0, 900]
-    this->bag = nullptr; // Bag will be assigned later
+    // this->bag = nullptr; // Bag will be assigned later
 }
 
 Warrior::~Warrior() {
-    delete bag;  // Clean up memory
+    // delete bag;  // Clean up memory
 }
 
-int Warrior::getHP() const {
+int Warrior::getHp() const {
     return hp;
 }
 
-void Warrior::setHP(int hp) {
+void Warrior::setHp(int hp) {
     this->hp = max(0, min(hp, 500));
 }
 
@@ -391,11 +391,11 @@ void DragonLord::setTrapped(int turns) {
     trapped_counter = max(trapped_counter, turns);
 }
 
-void DragonLord::setHP(int new_hp) {
+void DragonLord::setHp(int new_hp) {
     hp = max(0, min(new_hp, 5000));
 }
 
-int DragonLord::getHP() const {
+int DragonLord::getHp() const {
     return hp;
 }
 
@@ -584,11 +584,9 @@ string Configuration::str() const {
     ss << "]";
     return ss.str();
 }
-
-
-//GETTERS
-int Configuration::getMapRows() const { return map_num_rows; }
-int Configuration::getMapCols() const { return map_num_cols; }
+// ===== Configuration getters =====
+int Configuration::getMapNumRows() const { return map_num_rows; }
+int Configuration::getMapNumCols() const { return map_num_cols; }
 int Configuration::getNumObstacles() const { return num_obstacles; }
 int Configuration::getNumGroundObstacles() const { return num_ground_obstacles; }
 const Position* Configuration::getObstacles() const { return arr_obstacles; }
@@ -596,12 +594,12 @@ const Position* Configuration::getGroundObstacles() const { return arr_ground_ob
 
 const string& Configuration::getFlyTeam1Rule() const { return flyteam1_rule; }
 const Position& Configuration::getFlyTeam1Pos() const { return flyteam1_init_pos; }
-int Configuration::getFlyTeam1HP() const { return flyteam1_hp; }
+int Configuration::getFlyTeam1InitHP() const { return flyteam1_hp; }
 int Configuration::getFlyTeam1DMG() const { return flyteam1_dmg; }
 
 const string& Configuration::getFlyTeam2Rule() const { return flyteam2_rule; }
 const Position& Configuration::getFlyTeam2Pos() const { return flyteam2_init_pos; }
-int Configuration::getFlyTeam2HP() const { return flyteam2_hp; }
+int Configuration::getFlyTeam2InitHP() const { return flyteam2_hp; }
 int Configuration::getFlyTeam2DMG() const { return flyteam2_dmg; }
 
 const string& Configuration::getGroundTeamRule() const { return groundteam_rule; }
@@ -611,6 +609,7 @@ int Configuration::getGroundTeamDMG() const { return groundteam_dmg; }
 int Configuration::getGroundTeamTrapTurns() const { return groundteam_trap_turns; }
 
 int Configuration::getNumSteps() const { return num_steps; }
+
 
 
 ////////////////////////////////////////////////
