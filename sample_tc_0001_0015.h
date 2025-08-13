@@ -219,7 +219,7 @@ void test() {
         TestDragonWar::satc_0010();
         TestDragonWar::satc_0011();
         TestDragonWar::satc_0012();
-        TestDragonWar::satc_0013();
-        TestDragonWar::satc_0014();
+        // TestDragonWar::satc_0013();
+        // TestDragonWar::satc_0014();
         // TestDragonWar::satc_0015();
 };

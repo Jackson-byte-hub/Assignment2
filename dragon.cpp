@@ -227,40 +227,40 @@ Position FlyTeam::getNextPosition() {
     if (moving_rule.empty()) return Position::npos;
 
     char dir = moving_rule[moving_index];
+
     int r = pos.getRow();
     int c = pos.getCol();
-    Position next;
-
     switch (dir) {
-        case 'L': next = Position(r, c - 1); break;
-        case 'R': next = Position(r, c + 1); break;
-        case 'U': next = Position(r - 1, c); break;
-        case 'D': next = Position(r + 1, c); break;
-        default:  next = Position::npos; break; // invalid input
+        case 'L': c--; break; // Left
+        case 'R': c++; break; // Right
+        case 'U': r--; break; // Up
+        case 'D': r++; break; // Down
+        default:  return Position::npos; // Invalid char
     }
 
-    // Update index circularly
-    moving_index = (moving_index + 1) % moving_rule.length();
+    // Advance to next move in the rule (wrap around)
+    moving_index = (moving_index + 1) % moving_rule.size();
 
-    if (map->isValid(next, this))
+    Position next(r, c);
+    if (map && map->isValid(next, this))
         return next;
+
     return Position::npos;
 }
 
 void FlyTeam::move() {
-    Position next = getNextPosition();
-    if (next != Position::npos) {
-        pos = next;
+    for (size_t i = 0; i < moving_rule.size(); i++) {
+        Position next = getNextPosition();
+        if (next != Position::npos) {
+            pos = next;
+        }
     }
 }
 
 string FlyTeam::str() const {
     return "FlyTeam[index=" + to_string(index) +
            ";pos=" + pos.str() +
-           ";HP=" + to_string(hp) +
-           ";DMG=" + to_string(damage) +
-           ";rule=" + moving_rule +
-           ";idx=" + to_string(moving_index) + "]";
+           ";moving_rule=" + moving_rule + "]";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -274,40 +274,40 @@ Position GroundTeam::getNextPosition() {
     if (moving_rule.empty()) return Position::npos;
 
     char dir = moving_rule[moving_index];
+
     int r = pos.getRow();
     int c = pos.getCol();
-    Position next;
-
     switch (dir) {
-        case 'L': next = Position(r, c - 1); break;
-        case 'R': next = Position(r, c + 1); break;
-        case 'U': next = Position(r - 1, c); break;
-        case 'D': next = Position(r + 1, c); break;
-        default:  next = Position::npos; break;
+        case 'L': c--; break; // Left
+        case 'R': c++; break; // Right
+        case 'U': r--; break; // Up
+        case 'D': r++; break; // Down
+        default:  return Position::npos; // Invalid char
     }
 
-    // Circular update of index
-    moving_index = (moving_index + 1) % moving_rule.length();
+    // Advance to next move in the rule (wrap around)
+    moving_index = (moving_index + 1) % moving_rule.size();
 
-    if (map->isValid(next, this))
+    Position next(r, c);
+    if (map && map->isValid(next, this))
         return next;
+
     return Position::npos;
 }
 
 void GroundTeam::move() {
-    Position next = getNextPosition();
-    if (next != Position::npos) {
-        pos = next;
+    for (size_t i = 0; i < moving_rule.size(); i++) {
+        Position next = getNextPosition();
+        if (next != Position::npos) {
+            pos = next;
+        }
     }
 }
 
 string GroundTeam::str() const {
     return "GroundTeam[index=" + to_string(index) +
            ";pos=" + pos.str() +
-           ";HP=" + to_string(hp) +
-           ";DMG=" + to_string(damage) +
-           ";rule=" + moving_rule +
-           ";idx=" + to_string(moving_index) + "]";
+           ";rule=" + moving_rule +"]";
 }
 bool GroundTeam::trap(DragonLord* dragon) {
     // Check if on same tile
