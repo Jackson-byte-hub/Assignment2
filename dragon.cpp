@@ -258,7 +258,7 @@ void FlyTeam::move() {
 }
 
 string FlyTeam::str() const {
-    return "FlyTeam[index=" + to_string(index) +
+    return "FlyTeam" + to_string(index) + "[index=" + to_string(index) +
            ";pos=" + pos.str() +
            ";moving_rule=" + moving_rule + "]";
 }
@@ -447,8 +447,8 @@ string ArrayMovingObject::str() const {
 ////////////////////////////////////////////////////////////////////////
 
 Configuration::Configuration(const string &filepath) {
-    // Default values
-    map_num_rows = map_num_cols = 0;
+    // Initialize defaults
+    map_num_rows = map_num_cols = max_num_moving_objects = 0;
     num_obstacles = num_ground_obstacles = 0;
     arr_obstacles = nullptr;
     arr_ground_obstacles = nullptr;
@@ -456,6 +456,9 @@ Configuration::Configuration(const string &filepath) {
     flyteam2_hp = flyteam2_dmg = 0;
     groundteam_hp = groundteam_dmg = groundteam_trap_turns = 0;
     num_steps = 0;
+
+    // Temporary storage for array strings
+    string obst_str, gro_obst_str;
 
     ifstream fin(filepath.c_str());
     if (!fin.is_open()) {
@@ -465,13 +468,12 @@ Configuration::Configuration(const string &filepath) {
 
     string line;
     while (getline(fin, line)) {
-        // Remove spaces manually (legal version)
-        string cleanLine = "";
+        // Remove spaces
+        string cleanLine;
         for (size_t i = 0; i < line.length(); ++i) {
             char c = line[i];
-            if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+            if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
                 cleanLine += c;
-            }
         }
         if (cleanLine.empty()) continue;
 
@@ -484,62 +486,80 @@ Configuration::Configuration(const string &filepath) {
 
         if (key == "MAP_NUM_ROWS") map_num_rows = atoi(val.c_str());
         else if (key == "MAP_NUM_COLS") map_num_cols = atoi(val.c_str());
+        else if (key == "MAX_NUM_MOVING_OBJECTS") max_num_moving_objects = atoi(val.c_str());
+
         else if (key == "NUM_OBSTACLE") num_obstacles = atoi(val.c_str());
         else if (key == "ARRAY_OBSTACLE") {
-            if (num_obstacles > 0) {
-                arr_obstacles = new Position[num_obstacles];
-                string content = val.substr(1, val.size() - 2); // remove []
-                int idx = 0;
-                size_t start = 0;
-                while (start < content.size() && idx < num_obstacles) {
-                    size_t sep = content.find(';', start);
-                    if (sep == string::npos) sep = content.size();
-                    arr_obstacles[idx++] = Position(content.substr(start, sep - start));
-                    start = sep + 1;
-                }
+            obst_str = val;
+            if (num_obstacles == 0 && val.size() > 2) { // Auto-count
+                int count = 0;
+                for (size_t i = 0; i < val.size(); ++i)
+                    if (val[i] == '(') count++;
+                num_obstacles = count;
             }
         }
+
         else if (key == "NUM_GROUND_OBSTACLE") num_ground_obstacles = atoi(val.c_str());
         else if (key == "ARRAY_GROUND_OBSTACLE") {
-            if (num_ground_obstacles > 0) {
-                arr_ground_obstacles = new Position[num_ground_obstacles];
-                string content = val.substr(1, val.size() - 2); // remove []
-                int idx = 0;
-                size_t start = 0;
-                while (start < content.size() && idx < num_ground_obstacles) {
-                    size_t sep = content.find(';', start);
-                    if (sep == string::npos) sep = content.size();
-                    arr_ground_obstacles[idx++] = Position(content.substr(start, sep - start));
-                    start = sep + 1;
-                }
+            gro_obst_str = val;
+            if (num_ground_obstacles == 0 && val.size() > 2) { // Auto-count
+                int count = 0;
+                for (size_t i = 0; i < val.size(); ++i)
+                    if (val[i] == '(') count++;
+                num_ground_obstacles = count;
             }
         }
+
         else if (key == "FLYTEAM1_MOVING_RULE") flyteam1_rule = val;
         else if (key == "FLYTEAM1_INIT_POS") flyteam1_init_pos = Position(val);
         else if (key == "FLYTEAM1_INIT_HP") flyteam1_hp = atoi(val.c_str());
-        else if (key == "FLYTEAM1_INIT_DMG") flyteam1_dmg = atoi(val.c_str());
+        else if (key == "FLYTEAM1_INIT_DAMAGE") flyteam1_dmg = atoi(val.c_str());
 
         else if (key == "FLYTEAM2_MOVING_RULE") flyteam2_rule = val;
         else if (key == "FLYTEAM2_INIT_POS") flyteam2_init_pos = Position(val);
         else if (key == "FLYTEAM2_INIT_HP") flyteam2_hp = atoi(val.c_str());
-        else if (key == "FLYTEAM2_INIT_DMG") flyteam2_dmg = atoi(val.c_str());
+        else if (key == "FLYTEAM2_INIT_DAMAGE") flyteam2_dmg = atoi(val.c_str());
 
         else if (key == "GROUNDTEAM_MOVING_RULE") groundteam_rule = val;
         else if (key == "GROUNDTEAM_INIT_POS") groundteam_init_pos = Position(val);
         else if (key == "GROUNDTEAM_INIT_HP") groundteam_hp = atoi(val.c_str());
-        else if (key == "GROUNDTEAM_INIT_DMG") groundteam_dmg = atoi(val.c_str());
+        else if (key == "GROUNDTEAM_INIT_DAMAGE") groundteam_dmg = atoi(val.c_str());
         else if (key == "GROUNDTEAM_TRAP_TURNS") groundteam_trap_turns = atoi(val.c_str());
+
+        else if (key == "DRAGONLORD_INIT_POS") dragonlord_init_pos = Position(val);
 
         else if (key == "NUM_STEPS") num_steps = atoi(val.c_str());
     }
-
     fin.close();
+
+    // Allocate obstacles
+    if (num_obstacles > 0 && obst_str.size() >= 2) {
+        arr_obstacles = new Position[num_obstacles];
+        string content = obst_str.substr(1, obst_str.size() - 2); // strip []
+        int idx = 0;
+        size_t start = 0;
+        while (start < content.size() && idx < num_obstacles) {
+            size_t sep = content.find(';', start);
+            if (sep == string::npos) sep = content.size();
+            arr_obstacles[idx++] = Position(content.substr(start, sep - start));
+            start = sep + 1;
+        }
+    }
+
+    if (num_ground_obstacles > 0 && gro_obst_str.size() >= 2) {
+        arr_ground_obstacles = new Position[num_ground_obstacles];
+        string content = gro_obst_str.substr(1, gro_obst_str.size() - 2);
+        int idx = 0;
+        size_t start = 0;
+        while (start < content.size() && idx < num_ground_obstacles) {
+            size_t sep = content.find(';', start);
+            if (sep == string::npos) sep = content.size();
+            arr_ground_obstacles[idx++] = Position(content.substr(start, sep - start));
+            start = sep + 1;
+        }
+    }
 }
 
-Configuration::~Configuration() {
-    if (arr_obstacles) delete[] arr_obstacles;
-    if (arr_ground_obstacles) delete[] arr_ground_obstacles;
-}
 
 string Configuration::str() const {
     stringstream ss;
@@ -547,6 +567,7 @@ string Configuration::str() const {
 
     ss << "MAP_NUM_ROWS=" << map_num_rows << "\n";
     ss << "MAP_NUM_COLS=" << map_num_cols << "\n";
+    ss << "MAX_NUM_MOVING_OBJECTS=" << max_num_moving_objects << "\n";
     ss << "NUM_OBSTACLE=" << num_obstacles << "\n";
 
     ss << "ARRAY_OBSTACLE=[";
@@ -578,15 +599,23 @@ string Configuration::str() const {
     ss << "GROUNDTEAM_INIT_POS=" << groundteam_init_pos.str() << "\n";
     ss << "GROUNDTEAM_INIT_HP=" << groundteam_hp << "\n";
     ss << "GROUNDTEAM_INIT_DAMAGE=" << groundteam_dmg << "\n";
-    // ss << "DRAGONLORD_INIT_POS=" << dragonlord_init_pos.str() << "\n";
+
+    ss << "DRAGONLORD_INIT_POS=" << dragonlord_init_pos.str() << "\n";
 
     ss << "NUM_STEPS=" << num_steps << "\n";
     ss << "]";
     return ss.str();
 }
+
+Configuration::~Configuration() {
+    if (arr_obstacles) delete[] arr_obstacles;
+    if (arr_ground_obstacles) delete[] arr_ground_obstacles;
+}
+
 // ===== Configuration getters =====
 int Configuration::getMapNumRows() const { return map_num_rows; }
 int Configuration::getMapNumCols() const { return map_num_cols; }
+int Configuration::getMaxNumMovingObjects() const {return max_num_moving_objects;}
 int Configuration::getNumObstacles() const { return num_obstacles; }
 int Configuration::getNumGroundObstacles() const { return num_ground_obstacles; }
 const Position* Configuration::getObstacles() const { return arr_obstacles; }
@@ -608,8 +637,8 @@ int Configuration::getGroundTeamHP() const { return groundteam_hp; }
 int Configuration::getGroundTeamDMG() const { return groundteam_dmg; }
 int Configuration::getGroundTeamTrapTurns() const { return groundteam_trap_turns; }
 
+const Position Configuration::getDragonlordInitPos() const {return dragonlord_init_pos;}
 int Configuration::getNumSteps() const { return num_steps; }
-
 
 
 ////////////////////////////////////////////////

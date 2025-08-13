@@ -260,6 +260,9 @@ private:
     int groundteam_dmg;
     int groundteam_trap_turns;
 
+    int max_num_moving_objects;
+    Position dragonlord_init_pos;
+
     int num_steps;
 public:
     Configuration(const string & filepath);
@@ -289,6 +292,9 @@ public:
     int getGroundTeamHP() const;
     int getGroundTeamDMG() const;
     int getGroundTeamTrapTurns() const;
+
+    int getMaxNumMovingObjects() const;
+    const Position getDragonlordInitPos() const;
 
     int getNumSteps() const;
 };
