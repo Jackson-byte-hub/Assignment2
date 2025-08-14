@@ -36,6 +36,7 @@
 // class BaseBag;
 // class TeamBag;
 
+class ArrayMovingObject;
 class DragonLord;
 class MovingObject;
 class BaseBag;
@@ -134,7 +135,7 @@ public:
     void setDamage(int dmg);
     // getBag()
     BaseBag* getBag() const;
-
+    string getName() const { return name; }
 };
 
 // ——— FlyTeam  ———
@@ -188,6 +189,9 @@ private:
     int hp;
     int trapped_counter;
     GroundTeam* groundteam;
+    int step_counter = 0; // count only valid moves
+    ArrayMovingObject* arr_mv_objs; // needs to be passed in from outside
+    void spawnSmartDragon(const Position& prevPos);
 public:
     FlyTeam* flyteam1;
     FlyTeam* flyteam2;
@@ -203,13 +207,253 @@ public:
     void setTrapped(int turns);
     void setHp(int hp);
     int getHp() const;
+    void setArrayMovingObject(ArrayMovingObject* arr) { arr_mv_objs = arr; }
 };
 
 // ...................
-// ——— SmartDragon ———
 // ——— BaseItem ———
+class BaseItem {
+public:
+    virtual ~BaseItem() {}
+    virtual bool canUse(Warrior* w) = 0;
+    virtual void use(Warrior* w) = 0;
+};
+// ================= DragonScale =================
+class DragonScale : public BaseItem {
+public:
+    bool canUse(Warrior* w) {
+        return w && w->getDamage() <= 400;
+    }
+    void use(Warrior* w) {
+        if (canUse(w)) {
+            int dmg = w->getDamage();
+            int bonus = dmg * 25 / 100; // +25%
+            w->setDamage(dmg + bonus);
+        }
+    }
+};
+
+// ================= HealingHerb =================
+class HealingHerb : public BaseItem {
+public:
+    bool canUse(Warrior* w) {
+        return w && w->getHp() <= 100;
+    }
+    void use(Warrior* w) {
+        if (canUse(w)) {
+            int hp = w->getHp();
+            int bonus = hp * 20 / 100; // +20%
+            w->setHp(hp + bonus);
+        }
+    }
+};
+
+// ================= TrapEnhancer =================
+class TrapEnhancer : public BaseItem {
+public:
+    bool canUse(Warrior* w) {
+        // Works only for GroundTeam, but no condition
+        return dynamic_cast<GroundTeam*>(w) != nullptr;
+    }
+    void use(Warrior* w) {
+        GroundTeam* gt = dynamic_cast<GroundTeam*>(w);
+        if (gt) {
+            gt->setTrapTurns(gt->getTrapTurns() + 1);
+        }
+    }
+};
+// ——— SmartDragon ———
+class SmartDragon : public MovingObject {
+protected:
+    DragonType smartdragon_type;
+    int damage;
+    BaseItem* item;            // Item dropped on defeat
+    MovingObject* target;      // The object this Smart Dragon targets
+
+public:
+    DragonType getType() const { return smartdragon_type; }
+    SmartDragon(int index, const Position &init_pos, Map *map,
+                DragonType type, MovingObject *target, int damage)
+        : MovingObject(index, init_pos, map, "SmartDragon"),
+          smartdragon_type(type), damage(damage), item(nullptr), target(target) {}
+
+    virtual Position getNextPosition() = 0; // pure virtual
+    virtual void move() {
+        Position next = getNextPosition();
+        if (next != Position::npos) {
+            pos = next;
+        }
+    }
+
+    string str() const override {
+        string typeStr;
+        if (smartdragon_type == SD1) typeStr = "SD1";
+        else if (smartdragon_type == SD2) typeStr = "SD2";
+        else if (smartdragon_type == SD3) typeStr = "SD3";
+
+        return "smartdragon[pos=" + pos.str() +
+               ";type=" + typeStr +
+               ";tg=" + target->str() + "]";
+    }
+
+    int getDamage() const { return damage; }
+    void setDamage(int dmg) { damage = max(0, min(dmg, 900)); }
+};
+
+// ================= SD1 =================
+class SmartDragonSD1 : public SmartDragon {
+public:
+    SmartDragonSD1(int index, const Position &init_pos, Map *map,
+              DragonType type, MovingObject *flyteam1, int damage)
+        : SmartDragon(index, init_pos, map, type, flyteam1, damage) {
+        item = new DragonScale();
+    }
+
+    Position getNextPosition() override {
+        if (!target) return Position::npos;
+        Position tpos = target->getCurrentPosition();
+        int dr = tpos.getRow() - pos.getRow();
+        int dc = tpos.getCol() - pos.getCol();
+
+        // Movement priority: UP, RIGHT, DOWN, LEFT
+        Position next = pos;
+        if (dr < 0) next.setRow(pos.getRow() - 1);        // UP
+        else if (dc > 0) next.setCol(pos.getCol() + 1);   // RIGHT
+        else if (dr > 0) next.setRow(pos.getRow() + 1);   // DOWN
+        else if (dc < 0) next.setCol(pos.getCol() - 1);   // LEFT
+
+        return (map && map->isValid(next, this)) ? next : Position::npos;
+    }
+};
+
+// ================= SD2 =================
+class SmartDragonSD2 : public SmartDragon {
+public:
+    SmartDragonSD2(int index, const Position &init_pos, Map *map,
+              DragonType type, MovingObject *flyteam2, int damage)
+        : SmartDragon(index, init_pos, map, type, flyteam2, damage) {
+        item = new HealingHerb();
+    }
+
+    Position getNextPosition() override {
+        if (!target) return Position::npos;
+        Position tpos = target->getCurrentPosition();
+        int dr = tpos.getRow() - pos.getRow();
+        int dc = tpos.getCol() - pos.getCol();
+
+        // Movement priority: UP, RIGHT, DOWN, LEFT
+        Position next = pos;
+        if (dr < 0) next.setRow(pos.getRow() - 1);        // UP
+        else if (dc > 0) next.setCol(pos.getCol() + 1);   // RIGHT
+        else if (dr > 0) next.setRow(pos.getRow() + 1);   // DOWN
+        else if (dc < 0) next.setCol(pos.getCol() - 1);   // LEFT
+
+        return (map && map->isValid(next, this)) ? next : Position::npos;
+    }
+};
+
+// ================= SD3 =================
+class SmartDragonSD3 : public SmartDragon {
+public:
+    SmartDragonSD3(int index, const Position &init_pos, Map *map,
+              DragonType type, MovingObject *groundteam, int damage)
+        : SmartDragon(index, init_pos, map, type, groundteam, damage) {
+        item = new TrapEnhancer();
+    }
+
+    Position getNextPosition() override {
+        return Position::npos;
+        // SD3 does not move
+    }
+    BaseItem* Drop(MovingObject* killer) {
+        // If killed by GroundTeam → TrapEnhancer
+        if (dynamic_cast<GroundTeam*>(killer)) {
+            return new TrapEnhancer();
+        }
+        // If killed by FlyTeam1 → HealingHerb
+        if (auto ft = dynamic_cast<FlyTeam*>(killer)) {
+            if (ft->str().find("FlyTeam1") != string::npos) {
+                return new HealingHerb();
+            }
+            // If killed by FlyTeam2 → DragonScale
+            else if (ft->str().find("FlyTeam2") != string::npos) {
+                return new DragonScale();
+            }
+        }
+        // Fallback
+        return nullptr;
+    }
+};
+
 // ——— BaseBag ———
-class BaseBag;
+class BaseBag {
+protected:
+    BaseItem** items;   // dynamic array of BaseItem*
+    int capacity;       // maximum capacity
+    int count;          // current number of items
+    Warrior* owner;     // the Warrior that owns this bag
+
+public:
+    BaseBag(Warrior* w, int cap) : owner(w), capacity(cap), count(0) {
+        items = new BaseItem*[capacity];
+        for (int i = 0; i < capacity; i++) {
+            items[i] = nullptr;
+        }
+    }
+
+    virtual ~BaseBag() {
+        for (int i = 0; i < count; i++) {
+            delete items[i];
+        }
+        delete[] items;
+    }
+
+    virtual bool insert(BaseItem* item) {
+        if (count >= capacity) return false;
+        items[count++] = item;
+        return true;
+    }
+
+    virtual BaseItem* getUsableItem() {
+        for (int i = 0; i < count; i++) {
+            if (items[i] && items[i]->canUse(owner)) {
+                BaseItem* usable = items[i];
+
+                // Shift the rest left
+                for (int j = i; j < count - 1; j++) {
+                    items[j] = items[j + 1];
+                }
+                items[count - 1] = nullptr;
+                count--;
+
+                return usable;
+            }
+        }
+        return nullptr;
+    }
+
+    virtual string str() const {
+        string s = "Bag[";
+        for (int i = 0; i < count; i++) {
+            if (items[i]) {
+                s += typeid(*items[i]).name();
+            } else {
+                s += "null";
+            }
+            if (i != count - 1) s += ",";
+        }
+        s += "]";
+        return s;
+    }
+};
+
+class TeamBag : public BaseBag {
+public:
+    TeamBag(Warrior* w, int)
+        : BaseBag(w, (dynamic_cast<FlyTeam*>(w) ? 5 : 7)) {
+        // capacity is set automatically: 5 for FlyTeam, 7 for GroundTeam
+    }
+};
 // ...................
 
 // ——— ArrayMovingObject ———
@@ -219,6 +463,7 @@ private:
     MovingObject** arr_mv_objs;
     int count;
     int capacity;
+
 public:
     ArrayMovingObject(int capacity);
     ~ArrayMovingObject() ;
@@ -306,8 +551,7 @@ private:
 
     Configuration      *config;
 
-    FlyTeam            *flyteam1;
-    FlyTeam            *flyteam2;
+
     GroundTeam         *groundteam;
     DragonLord         *dragonlord;
 
@@ -315,6 +559,8 @@ private:
     ArrayMovingObject  *arr_mv_objs;
     
 public:
+    FlyTeam            *flyteam1;
+    FlyTeam            *flyteam2;
     DragonWarriorsProgram(const string &config_file_path);
     
     bool   isStop() const;

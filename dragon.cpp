@@ -189,11 +189,11 @@ Warrior::Warrior(int index, const Position &pos, Map *map, const string &name, i
 : MovingObject(index, pos, map, name) {
     this->hp = max(0, min(hp, 500));       // HP [0, 500]
     this->damage = max(0, min(damage, 900)); // DMG [0, 900]
-    // this->bag = nullptr; // Bag will be assigned later
+    bag = new TeamBag(this,10);
 }
 
 Warrior::~Warrior() {
-    // delete bag;  // Clean up memory
+    delete bag;  // Clean up memory
 }
 
 int Warrior::getHp() const {
@@ -258,9 +258,16 @@ void FlyTeam::move() {
 }
 
 string FlyTeam::str() const {
-    return "FlyTeam" + to_string(index) + "[index=" + to_string(index) +
-           ";pos=" + pos.str() +
-           ";moving_rule=" + moving_rule + "]";
+    if (index != 0) {
+        return "FlyTeam" + to_string(index) +
+               "[index=" + to_string(index) +
+               ";pos=" + pos.str() +
+               ";moving_rule=" + moving_rule + "]";
+    } else {
+        return "FlyTeam1[index=" + to_string(index) +
+               ";pos=" + pos.str() +
+               ";moving_rule=" + moving_rule + "]";
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -379,13 +386,19 @@ void DragonLord::move() {
         trapped_counter--;
         return;
     }
-
+    Position prev = pos;
     Position next = getNextPosition();
 
-    if (next != Position::npos) {
-        pos = next;
+    if (next != Position::npos && next != pos) { // valid new tile
+        pos = next; // actually move
+        step_counter++;
+        if (step_counter % 5 == 0 && arr_mv_objs != nullptr && !arr_mv_objs->isFull()) {
+            // Spawn SmartDragon at 'prev'
+            spawnSmartDragon(prev);
+        }
     }
 }
+
 
 void DragonLord::setTrapped(int turns) {
     trapped_counter = max(trapped_counter, turns);
@@ -402,6 +415,84 @@ int DragonLord::getHp() const {
 string DragonLord::str() const {
     return "DragonLord[index=" + to_string(index) +
            ";pos=" + pos.str() + "]";
+}
+
+
+////////////////////////////////////////////////////////////////////////
+/// Smart Dragon
+////////////////////////////////////////////////////////////////////////
+void DragonLord::spawnSmartDragon(const Position& spawnPos) {
+    if (!arr_mv_objs || arr_mv_objs->isFull()) return;
+
+    // Count existing Smart Dragons
+    int countSD1 = 0, countSD2 = 0, countSD3 = 0;
+    for (int i = 0; i < arr_mv_objs->size(); ++i) {
+        SmartDragon* sd = dynamic_cast<SmartDragon*>(arr_mv_objs->get(i));
+        if (sd) {
+            if (sd->getType() == SD1) countSD1++;
+            else if (sd->getType() == SD2) countSD2++;
+            else if (sd->getType() == SD3) countSD3++;
+        }
+    }
+
+    DragonType typeToCreate;
+
+    // Rule 1: First Smart Dragon is SD1
+    if (countSD1 + countSD2 + countSD3 == 0) {
+        typeToCreate = SD1;
+    }
+    else {
+        // Manhattan distances
+        int dist1 = abs(spawnPos.getRow() - flyteam1->getCurrentPosition().getRow()) +
+                    abs(spawnPos.getCol() - flyteam1->getCurrentPosition().getCol());
+        int dist2 = abs(spawnPos.getRow() - flyteam2->getCurrentPosition().getRow()) +
+                    abs(spawnPos.getCol() - flyteam2->getCurrentPosition().getCol());
+        int dist3 = abs(spawnPos.getRow() - groundteam->getCurrentPosition().getRow()) +
+                    abs(spawnPos.getCol() - groundteam->getCurrentPosition().getCol());
+
+        int minDist = dist1;
+        if (dist2 < minDist) minDist = dist2;
+        if (dist3 < minDist) minDist = dist3;
+
+        bool tie1 = (dist1 == minDist);
+        bool tie2 = (dist2 == minDist);
+        bool tie3 = (dist3 == minDist);
+
+        if ((tie1 + tie2 + tie3) == 1) {
+            // Only one closest
+            if (tie1) typeToCreate = SD1;
+            else if (tie2) typeToCreate = SD2;
+            else typeToCreate = SD3;
+        } else {
+            // Tie: pick one with least count
+            typeToCreate = SD1;
+            int minCount = 1000000;
+
+            if (tie1 && countSD1 < minCount) {
+                minCount = countSD1;
+                typeToCreate = SD1;
+            }
+            if (tie2 && countSD2 < minCount) {
+                minCount = countSD2;
+                typeToCreate = SD2;
+            }
+            if (tie3 && countSD3 < minCount) {
+                minCount = countSD3;
+                typeToCreate = SD3;
+            }
+        }
+    }
+
+    // Create new SmartDragon
+    MovingObject* newDragon = nullptr;
+    if (typeToCreate == SD1)
+        newDragon = new SmartDragonSD1(arr_mv_objs->size(), spawnPos, map, SD1, flyteam1, 100);
+    else if (typeToCreate == SD2)
+        newDragon = new SmartDragonSD2(arr_mv_objs->size(), spawnPos, map, SD2, flyteam2, 100);
+    else
+        newDragon = new SmartDragonSD3(arr_mv_objs->size(), spawnPos, map, SD3, groundteam, 100);
+
+    if (newDragon) arr_mv_objs->add(newDragon);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -639,6 +730,104 @@ int Configuration::getGroundTeamTrapTurns() const { return groundteam_trap_turns
 
 const Position Configuration::getDragonlordInitPos() const {return dragonlord_init_pos;}
 int Configuration::getNumSteps() const { return num_steps; }
+
+
+//// ================== DragonWarriorsProgram ==================
+// DragonWarriorsProgram::DragonWarriorsProgram(const string &filepath) {
+//     // 1. Load configuration
+//     config = new Configuration(filepath);
+//
+//     // 2. Build the map
+//     map = new Map(
+//         config->getMapNumRows(),
+//         config->getMapNumCols(),
+//         config->getNumObstacles(),
+//         const_cast<Position*>(config->getObstacles()),
+//         config->getNumGroundObstacles(),
+//         const_cast<Position*>(config->getGroundObstacles())
+//     );
+//
+//     // 3. Create moving object array
+//     arr_mv_objs = new ArrayMovingObject(config->getMaxNumMovingObjects());
+//
+//     // 4. Create teams
+//     flyteam1 = new FlyTeam(
+//         1,
+//         config->getFlyTeam1Rule(),
+//         config->getFlyTeam1Pos(),
+//         map,
+//         config->getFlyTeam1InitHP(),
+//         config->getFlyTeam1DMG()
+//     );
+//     flyteam1->setBag(new TeamBag(flyteam1)); // bag with correct capacity
+//
+//     flyteam2 = new FlyTeam(
+//         2,
+//         config->getFlyTeam2Rule(),
+//         config->getFlyTeam2Pos(),
+//         map,
+//         config->getFlyTeam2InitHP(),
+//         config->getFlyTeam2DMG()
+//     );
+//     flyteam2->setBag(new TeamBag(flyteam2));
+//
+//     groundteam = new GroundTeam(
+//         1,
+//         config->getGroundTeamRule(),
+//         config->getGroundTeamPos(),
+//         map,
+//         config->getGroundTeamHP(),
+//         config->getGroundTeamDMG()
+//     );
+//     groundteam->setBag(new TeamBag(groundteam));
+//     groundteam->setTrapTurns(config->getGroundTeamTrapTurns());
+//
+//     // 5. Create DragonLord
+//     dragonlord = new DragonLord(
+//         1,
+//         config->getDragonlordInitPos(),
+//         map,
+//         flyteam1,
+//         flyteam2,
+//         groundteam
+//     );
+//     dragonlord->setArrayMovingObject(arr_mv_objs);
+//
+//     // 6. Add all starting objects to array
+//     arr_mv_objs->add(flyteam1);
+//     arr_mv_objs->add(flyteam2);
+//     arr_mv_objs->add(groundteam);
+//     arr_mv_objs->add(dragonlord);
+// }
+//
+// DragonWarriorsProgram::~DragonWarriorsProgram() {
+//     delete arr_mv_objs; // deletes all moving objects inside
+//     delete map;
+//     delete config;
+// }
+//
+// void DragonWarriorsProgram::run() {
+//     int total_steps = config->getNumSteps();
+//
+//     for (int step = 0; step < total_steps; ++step) {
+//         // Move all moving objects in order
+//         for (int i = 0; i < arr_mv_objs->size(); ++i) {
+//             arr_mv_objs->get(i)->move();
+//         }
+//
+//         // For now, just print the state each step
+//         cout << "----- Step " << step+1 << " -----" << endl;
+//         cout << arr_mv_objs->str() << endl;
+//     }
+// }
+//
+// string DragonWarriorsProgram::str() const {
+//     stringstream ss;
+//     ss << "DragonWarriorsProgram State:" << endl;
+//     ss << arr_mv_objs->str() << endl;
+//     return ss.str();
+// }
+
 
 
 ////////////////////////////////////////////////
