@@ -19,27 +19,23 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Forward declaration
-// class MovingObject;
-// class ArrayMovingObject
-// class DragonWarriorsProgram
-// class Position;
-// class Configuration;
-// class Map;
-
-// class DragonLord;
-// class SmartDragon;
-// class Warrior;
-// class FlyTeam;
-// class GroundTeam;
-
-// class BaseItem;
-// class BaseBag;
-// class TeamBag;
-
-class ArrayMovingObject;
-class DragonLord;
 class MovingObject;
+class ArrayMovingObject;
+class DragonWarriorsProgram;
+class Position;
+class Configuration;
+class Map;
+
+class DragonLord;
+class SmartDragon;
+class Warrior;
+class FlyTeam;
+class GroundTeam;
+
+class BaseItem;
 class BaseBag;
+class TeamBag;
+
 class TestDragonWar;
 
 // ——— Enums ———
@@ -113,8 +109,10 @@ public:
     virtual Position getNextPosition() = 0;
 
     const Position &getCurrentPosition() const;
+    void setPosition(const Position &p) { pos = p; }
     virtual void      move()          = 0;
     virtual string    str()    const = 0;
+
 };
 
 // ——— Warrior ———
@@ -155,7 +153,7 @@ public:
     // str()
     string str() const override;
     // attack()
-
+       bool attack(DragonLord *dragon);
 };
 
 // ——— GroundTeam  ———
@@ -298,6 +296,11 @@ public:
 
     int getDamage() const { return damage; }
     void setDamage(int dmg) { damage = max(0, min(dmg, 900)); }
+
+    virtual BaseItem* drop(Warrior* killer) {
+        return item;
+    }
+
 };
 
 // ================= SD1 =================
@@ -431,7 +434,9 @@ public:
         }
         return nullptr;
     }
-
+    virtual string getName() const {
+        return typeid(*this).name();
+    }
     virtual string str() const {
         string s = "Bag[";
         for (int i = 0; i < count; i++) {
@@ -474,6 +479,7 @@ public:
     int size() const { return count; }  // assuming count is element counter
     MovingObject* get(int index) const { return arr_mv_objs[index]; } // assuming arr holds pointers
 
+    bool removeAt(int index);
 };
 
 // ——— Configuration ———
@@ -547,22 +553,24 @@ public:
 // ——— DragonWarriorsProgram ———
 class DragonWarriorsProgram {
 private:
+
+
+public:
     // Sample attributes
 
     Configuration      *config;
 
+    FlyTeam            *flyteam1;
+    FlyTeam            *flyteam2;
 
     GroundTeam         *groundteam;
     DragonLord         *dragonlord;
 
     Map                *map;
     ArrayMovingObject  *arr_mv_objs;
-    
-public:
-    FlyTeam            *flyteam1;
-    FlyTeam            *flyteam2;
+
     DragonWarriorsProgram(const string &config_file_path);
-    
+
     bool   isStop() const;
     FlyTeam* getFlyTeam1() const { return flyteam1; }
     FlyTeam* getFlyTeam2() const { return flyteam2; }
@@ -584,25 +592,8 @@ public:
             << flyteam1->str() << "--|--" << flyteam2->str()<< "--|--" << groundteam->str() << "--|--" << dragonlord->str() << endl;
     }
 
-    void run(bool verbose) {
-        // Note: This is a sample code. You can change the implementation as you like.
-        // TODO
-        for (int istep = 0; istep < config->getNumSteps(); ++istep) {
-            for (int i = 0; i < arr_mv_objs->size(); ++i) {
-                arr_mv_objs->get(i)->move();
-                if (isStop()) {
-                    printStep(istep);
-                    break;
-                }
-                if (verbose) {
-                    printStep(istep);
-                }
-            }
-        }
-        printResult();
-    }
+    void run(bool verbose);
 
-    ~DragonWarriorsProgram();
 };
 
 ////////////////////////////////////////////////

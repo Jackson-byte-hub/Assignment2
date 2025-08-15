@@ -270,6 +270,22 @@ string FlyTeam::str() const {
     }
 }
 
+bool FlyTeam::attack(DragonLord *dragon) {
+    if (!dragon) return false;
+
+    // Must be in same position to attack
+    if (pos != dragon->getCurrentPosition()) {
+        return false;
+    }
+
+    // Apply damage
+    int remaining_hp = dragon->getHp() - this->getDamage();
+    dragon->setHp(remaining_hp);
+
+    // Return true if DragonLord is defeated
+    return dragon->getHp() <= 0;
+}
+
 ////////////////////////////////////////////////////////////////////////
 /// GroundTeam
 ////////////////////////////////////////////////////////////////////////
@@ -317,17 +333,16 @@ string GroundTeam::str() const {
            ";moving_rule=" + moving_rule +"]";
 }
 bool GroundTeam::trap(DragonLord* dragon) {
-    // Check if on same tile
-    if (dragon == nullptr) return false;
+    if (!dragon) return false;
 
+    // Must be on the same tile
     if (pos == dragon->getCurrentPosition()) {
         if (trap_turns > 0) {
-            // Trap successful
-            trap_turns--;
+            dragon->setTrapped(trap_turns); // immobilize DragonLord
+            trap_turns--; // consume one turn of trap ability
             return true;
         }
     }
-
     return false;
 }
 // getter and setter
@@ -382,22 +397,35 @@ Position DragonLord::getNextPosition() {
 }
 
 void DragonLord::move() {
+    // If trapped, skip move and decrement counter
     if (trapped_counter > 0) {
         trapped_counter--;
+
+        // If trap just expired, teleport GroundTeam and deduct HP
+        if (trapped_counter == 0 && groundteam) {
+            Position oldPos = groundteam->getCurrentPosition();
+            Position newPos(oldPos.getCol(), oldPos.getRow());
+            groundteam->setPosition(newPos);
+            groundteam->setHp(groundteam->getHp() - 200);
+        }
         return;
     }
+
     Position prev = pos;
     Position next = getNextPosition();
 
-    if (next != Position::npos && next != pos) { // valid new tile
-        pos = next; // actually move
+    // Only move if the position is valid and different
+    if (next != Position::npos && next != pos) {
+        pos = next;
         step_counter++;
-        if (step_counter % 5 == 0 && arr_mv_objs != nullptr && !arr_mv_objs->isFull()) {
-            // Spawn SmartDragon at 'prev'
+
+        // Only spawn SmartDragon if not trapped and moving
+        if (step_counter % 5 == 0 && arr_mv_objs && !arr_mv_objs->isFull()) {
             spawnSmartDragon(prev);
         }
     }
 }
+
 
 
 void DragonLord::setTrapped(int turns) {
@@ -518,6 +546,16 @@ bool ArrayMovingObject::isFull() const {
 bool ArrayMovingObject::add(MovingObject* mv_obj) {
     if (isFull()) return false;
     arr_mv_objs[count++] = mv_obj;
+    return true;
+}
+
+bool ArrayMovingObject::removeAt(int index) {
+    if (index < 0 || index >= count) return false;
+    delete arr_mv_objs[index];
+    for (int i = index; i < count - 1; ++i) {
+        arr_mv_objs[i] = arr_mv_objs[i + 1];
+    }
+    count--;
     return true;
 }
 
@@ -733,100 +771,191 @@ int Configuration::getNumSteps() const { return num_steps; }
 
 
 //// ================== DragonWarriorsProgram ==================
-// DragonWarriorsProgram::DragonWarriorsProgram(const string &filepath) {
-//     // 1. Load configuration
-//     config = new Configuration(filepath);
-//
-//     // 2. Build the map
-//     map = new Map(
-//         config->getMapNumRows(),
-//         config->getMapNumCols(),
-//         config->getNumObstacles(),
-//         const_cast<Position*>(config->getObstacles()),
-//         config->getNumGroundObstacles(),
-//         const_cast<Position*>(config->getGroundObstacles())
-//     );
-//
-//     // 3. Create moving object array
-//     arr_mv_objs = new ArrayMovingObject(config->getMaxNumMovingObjects());
-//
-//     // 4. Create teams
-//     flyteam1 = new FlyTeam(
-//         1,
-//         config->getFlyTeam1Rule(),
-//         config->getFlyTeam1Pos(),
-//         map,
-//         config->getFlyTeam1InitHP(),
-//         config->getFlyTeam1DMG()
-//     );
-//     flyteam1->setBag(new TeamBag(flyteam1)); // bag with correct capacity
-//
-//     flyteam2 = new FlyTeam(
-//         2,
-//         config->getFlyTeam2Rule(),
-//         config->getFlyTeam2Pos(),
-//         map,
-//         config->getFlyTeam2InitHP(),
-//         config->getFlyTeam2DMG()
-//     );
-//     flyteam2->setBag(new TeamBag(flyteam2));
-//
-//     groundteam = new GroundTeam(
-//         1,
-//         config->getGroundTeamRule(),
-//         config->getGroundTeamPos(),
-//         map,
-//         config->getGroundTeamHP(),
-//         config->getGroundTeamDMG()
-//     );
-//     groundteam->setBag(new TeamBag(groundteam));
-//     groundteam->setTrapTurns(config->getGroundTeamTrapTurns());
-//
-//     // 5. Create DragonLord
-//     dragonlord = new DragonLord(
-//         1,
-//         config->getDragonlordInitPos(),
-//         map,
-//         flyteam1,
-//         flyteam2,
-//         groundteam
-//     );
-//     dragonlord->setArrayMovingObject(arr_mv_objs);
-//
-//     // 6. Add all starting objects to array
-//     arr_mv_objs->add(flyteam1);
-//     arr_mv_objs->add(flyteam2);
-//     arr_mv_objs->add(groundteam);
-//     arr_mv_objs->add(dragonlord);
-// }
-//
-// DragonWarriorsProgram::~DragonWarriorsProgram() {
-//     delete arr_mv_objs; // deletes all moving objects inside
-//     delete map;
-//     delete config;
-// }
-//
-// void DragonWarriorsProgram::run() {
-//     int total_steps = config->getNumSteps();
-//
-//     for (int step = 0; step < total_steps; ++step) {
-//         // Move all moving objects in order
-//         for (int i = 0; i < arr_mv_objs->size(); ++i) {
-//             arr_mv_objs->get(i)->move();
-//         }
-//
-//         // For now, just print the state each step
-//         cout << "----- Step " << step+1 << " -----" << endl;
-//         cout << arr_mv_objs->str() << endl;
-//     }
-// }
-//
-// string DragonWarriorsProgram::str() const {
-//     stringstream ss;
-//     ss << "DragonWarriorsProgram State:" << endl;
-//     ss << arr_mv_objs->str() << endl;
-//     return ss.str();
-// }
+DragonWarriorsProgram::DragonWarriorsProgram(const string &filepath) {
+    // 1. Load configuration
+    config = new Configuration(filepath);
+
+    // 2. Build the map
+    map = new Map(
+        config->getMapNumRows(),
+        config->getMapNumCols(),
+        config->getNumObstacles(),
+        const_cast<Position*>(config->getObstacles()),
+        config->getNumGroundObstacles(),
+        const_cast<Position*>(config->getGroundObstacles())
+    );
+
+    // 3. Create moving object array
+    arr_mv_objs = new ArrayMovingObject(config->getMaxNumMovingObjects());
+
+    // 4. Create teams
+    flyteam1 = new FlyTeam(
+        1,
+        config->getFlyTeam1Rule(),
+        config->getFlyTeam1Pos(),
+        map,
+        config->getFlyTeam1InitHP(),
+        config->getFlyTeam1DMG()
+    );
+
+    flyteam2 = new FlyTeam(
+        2,
+        config->getFlyTeam2Rule(),
+        config->getFlyTeam2Pos(),
+        map,
+        config->getFlyTeam2InitHP(),
+        config->getFlyTeam2DMG()
+    );
+
+    groundteam = new GroundTeam(
+        3,
+        config->getGroundTeamRule(),
+        config->getGroundTeamPos(),
+        map,
+        config->getGroundTeamHP(),
+        config->getGroundTeamDMG()
+    );
+    groundteam->setTrapTurns(config->getGroundTeamTrapTurns());
+
+    // 5. Create DragonLord
+    dragonlord = new DragonLord(
+        4,
+        config->getDragonlordInitPos(),
+        map,
+        flyteam1,
+        flyteam2,
+        groundteam
+    );
+
+    // Give DragonLord access to moving object array
+    dragonlord->setArrayMovingObject(arr_mv_objs);
+
+    // 6. Add all starting objects to array
+    arr_mv_objs->add(flyteam1);
+    arr_mv_objs->add(flyteam2);
+    arr_mv_objs->add(groundteam);
+    arr_mv_objs->add(dragonlord);
+}
+
+
+
+bool DragonWarriorsProgram::isStop() const {
+    // Victory: DragonLord defeated
+    if (dragonlord->getHp() <= 0) return true;
+
+    // Loss conditions from spec
+    if (flyteam1->getHp() <= 1 && flyteam2->getHp() <= 1) return true;
+    if (flyteam1->getHp() <= 1 && flyteam2->getHp() > 1) return true;
+
+    return false;
+}
+
+void DragonWarriorsProgram::run(bool verbose) {
+    for (int istep = 0; istep < config->getNumSteps(); ++istep) {
+        for (int i = 0; i < arr_mv_objs->size(); ++i) {
+            arr_mv_objs->get(i)->move();
+
+            Warrior* wr = dynamic_cast<Warrior*>(arr_mv_objs->get(i));
+            if (wr) {
+
+                // === Check Dragon Lord encounter ===
+                if (wr->getCurrentPosition().isEqual(dragonlord->getCurrentPosition())) {
+                    if (auto ft = dynamic_cast<FlyTeam*>(wr)) {
+                        if (ft->attack(dragonlord)) {
+                            if (verbose) printStep(istep);
+                            printResult();
+                            return; // game ends
+                        }
+                    }
+                    else if (auto gt = dynamic_cast<GroundTeam*>(wr)) {
+                        dragonlord->setTrapped(gt->getTrapTurns());
+
+                        // DragonLord::Move will do the post trap
+
+                        // === Check SmartDragon combat ===
+                        for (int j = 0; j < arr_mv_objs->size(); ++j) {
+                            SmartDragon* sd = dynamic_cast<SmartDragon*>(arr_mv_objs->get(j));
+                            if (sd && sd->getCurrentPosition().isEqual(wr->getCurrentPosition())) {
+
+                                bool sdDefeated = false;
+
+                                switch (sd->getType()) {
+                                    case SD1:
+                                        if (wr->getDamage() >= sd->getDamage()) {
+                                            sdDefeated = true;
+                                        } else {
+                                            wr->setHp(wr->getHp() - 100);
+                                            if (wr->getHp() <= 0) {
+                                                arr_mv_objs->removeAt(i);
+                                                i--;
+                                            }
+                                        }
+                                        break;
+
+                                    case SD2:
+                                        if (wr->getDamage() > sd->getDamage()) {
+                                            sdDefeated = true;
+                                        } else {
+                                            wr->setHp(wr->getHp() - 100);
+                                            if (wr->getHp() <= 0) {
+                                                arr_mv_objs->removeAt(i);
+                                                i--;
+                                            }
+                                        }
+                                        break;
+
+                                    case SD3:
+                                        if (wr->getDamage() >= sd->getDamage()) {
+                                            sdDefeated = true;
+                                        } else {
+                                            wr->setHp(wr->getHp() - 100);
+                                            if (wr->getHp() <= 0) {
+                                                arr_mv_objs->removeAt(i);
+                                                i--;
+                                            }
+                                        }
+                                        break;
+                                }
+
+                                if (sdDefeated) {
+                                    BaseItem* loot = nullptr;
+
+                                    if (sd->getType() == SD3) {
+                                        SmartDragonSD3* sd3 = dynamic_cast<SmartDragonSD3*>(sd);
+                                        if (sd3) loot = sd3->Drop(wr);
+                                    } else {
+                                        loot = sd->drop(wr);
+                                    }
+
+                                    if (loot && wr->getBag() && wr->getBag()->insert(loot)) {
+                                        cout << wr->getName() << " obtained " << typeid(*loot).name() << endl;
+                                    } else {
+                                        delete loot;
+                                    }
+
+                                    arr_mv_objs->removeAt(j);
+                                    j--;
+                                }
+                            }
+                        }
+                    }
+
+                    // Stop conditions
+                    if (isStop()) {
+                        if (verbose) printStep(istep);
+                        printResult();
+                        return;
+                    }
+
+                    if (verbose) {
+                        printStep(istep);
+                    }
+                }
+            }
+            printResult();
+        }
+    }
+}
 
 
 

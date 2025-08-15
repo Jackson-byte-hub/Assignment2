@@ -79,40 +79,87 @@ public:
         g_satc_02();
     }
 
-    // static void satc_03() {
-    //     // Sample test for SD1
-    //     cout << "----- Sample Testcase 03 -----" << endl;
-    //     int num_obstacle = 3;
-    //     Position arr_obstacle[] = {Position(4, 6), Position(8, 8), Position(2, 5)};
-    //     int num_ground_obstacle = 1;
-    //     Position arr_ground_obstacle[] = {Position(5, 0)};
-    //
-    //     Map * map = new Map(10, 10, num_obstacle, arr_obstacle, num_ground_obstacle, arr_ground_obstacle);
-    //
-    //     FlyTeam * flyteam1 = new FlyTeam(1, "RUU", Position(7, 6), map, 250, 650);
-    //     FlyTeam * flyteam2 = new FlyTeam(2, "LLD", Position(1, 3), map, 250, 550);
-    //     GroundTeam * groundteam = new GroundTeam(3, "LU", Position(8, 8), map, 400, 350);
-    //     DragonLord * dragonlord = new DragonLord(0, Position(7, 9), map, flyteam1, flyteam2, groundteam);
-    //     dragonlord->move();
-    //
-    //     SmartDragon * sd1 = new SmartDragon(3, Position(7,9), map, DragonType::SD1, flyteam1, 200);
-    //     cout << "Current position of DragonLord: " << dragonlord->str() << endl;
-    //     cout << "DragonLord makes a move" << endl;
-    //     dragonlord->move();
-    //     cout << "New position of DragonLord: " << dragonlord->str() << endl;
-    //
-    //     cout << "Current position of SD1: " << sd1->str() << endl;
-    //     cout << "SD1 makes a move" << endl;
-    //     sd1->move();
-    //     cout << "New position of SD1: " << sd1->str() << endl;
-    //
-    //     delete flyteam1;
-    //     delete flyteam2;
-    //     delete groundteam;
-    //     delete dragonlord;
-    //     delete map;
-    //     delete sd1;
-    // }
+    static void satc_03() {
+        // Sample test for SD1
+        cout << "----- Sample Testcase 03 -----" << endl;
+        int num_obstacle = 3;
+        Position arr_obstacle[] = {Position(4, 6), Position(8, 8), Position(2, 5)};
+        int num_ground_obstacle = 1;
+        Position arr_ground_obstacle[] = {Position(5, 0)};
+
+        Map * map = new Map(10, 10, num_obstacle, arr_obstacle, num_ground_obstacle, arr_ground_obstacle);
+
+        FlyTeam * flyteam1 = new FlyTeam(1, "RUU", Position(7, 6), map, 250, 650);
+        FlyTeam * flyteam2 = new FlyTeam(2, "LLD", Position(1, 3), map, 250, 550);
+        GroundTeam * groundteam = new GroundTeam(3, "LU", Position(8, 8), map, 400, 350);
+        DragonLord * dragonlord = new DragonLord(0, Position(7, 9), map, flyteam1, flyteam2, groundteam);
+        dragonlord->move();
+
+        SmartDragon * sd1 = new SmartDragon(3, Position(7,9), map, DragonType::SD1, flyteam1, 200);
+        cout << "Current position of DragonLord: " << dragonlord->str() << endl;
+        cout << "DragonLord makes a move" << endl;
+        dragonlord->move();
+        cout << "New position of DragonLord: " << dragonlord->str() << endl;
+
+        cout << "Current position of SD1: " << sd1->str() << endl;
+        cout << "SD1 makes a move" << endl;
+        sd1->move();
+        cout << "New position of SD1: " << sd1->str() << endl;
+
+        delete flyteam1;
+        delete flyteam2;
+        delete groundteam;
+        delete dragonlord;
+        delete map;
+        delete sd1;
+    }
+    static void satc_19() {
+        cout << "\n----- Sample Testcase 19 -----" << endl;
+        string config_path = "sa_tc_06_config";
+        bool verbose = true;
+        DragonWarriorsProgram * program = new DragonWarriorsProgram(config_path);
+        cout << "------------------------------------------------------!BEGIN!------------------------------------------------------" << endl;
+        cout << "Step:START--" << program->flyteam1->str() << "--|--" << program->flyteam2->str() << "--|--" << program->groundteam->str() << "--|--" << program->dragonlord->str() << endl;
+        program->run(verbose);
+        cout << "-------------------------------------------------------!END!-------------------------------------------------------" << endl;
+        delete program;
+    }
+
+    static void satc_20() {
+        cout << "\n----- Sample Testcase 20 -----" << endl;
+        string config_path = "sa_tc_07_config";
+        bool verbose = true;
+        DragonWarriorsProgram * program = new DragonWarriorsProgram(config_path);
+        cout << "------------------------------------------------------!BEGIN!------------------------------------------------------" << endl;
+        cout << "Step:START--" << program->flyteam1->str() << "--|--" << program->flyteam2->str() << "--|--" << program->groundteam->str() << "--|--" << program->dragonlord->str() << endl;
+        program->run(verbose);
+        cout << "-------------------------------------------------------!END!-------------------------------------------------------" << endl;
+        delete program;
+    }
+
+    static void satc_21() {
+        cout << "\n----- Sample Testcase 21 -----" << endl;
+        string config_path = "sa_tc_08_config";
+        bool verbose = true;
+        DragonWarriorsProgram * program = new DragonWarriorsProgram(config_path);
+        cout << "------------------------------------------------------!BEGIN!------------------------------------------------------" << endl;
+        cout << "Step:START--" << program->flyteam1->str() << "--|--" << program->flyteam2->str() << "--|--" << program->groundteam->str() << "--|--" << program->dragonlord->str() << endl;
+        program->run(verbose);
+        cout << "-------------------------------------------------------!END!-------------------------------------------------------" << endl;
+        delete program;
+    }
+
+    static void satc_22() {
+        cout << "\n----- Sample Testcase 22 -----" << endl;
+        string config_path = "sa_tc_09_config";
+        bool verbose = true;
+        DragonWarriorsProgram * program = new DragonWarriorsProgram(config_path);
+        cout << "------------------------------------------------------!BEGIN!------------------------------------------------------" << endl;
+        cout << "Step:START--" << program->flyteam1->str() << "--|--" << program->flyteam2->str() << "--|--" << program->groundteam->str() << "--|--" << program->dragonlord->str() << endl;
+        program->run(verbose);
+        cout << "-------------------------------------------------------!END!-------------------------------------------------------" << endl;
+        delete program;
+    }
 };
 
 
@@ -120,7 +167,10 @@ public:
 int main(int argc, const char * argv[]) {
     TestDragonWar::satc_01();
     TestDragonWar::satc_02();
-    // TestDragonWar::satc_03();
+    TestDragonWar::satc_19();
+    TestDragonWar::satc_20();
+    TestDragonWar::satc_21();
+    TestDragonWar::satc_22();
     // test();
     return 0;
 }
