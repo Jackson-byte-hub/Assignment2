@@ -1,0 +1,301 @@
+----- Sample Testcase 19 -----
+------------------------------------------------------!BEGIN!------------------------------------------------------
+Step:START--FlyTeam1[index=1;pos=(0,0);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(5,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(3,3);moving_rule=UL]--|--DragonLord[index=0;pos=(4,4)]
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0000--FlyTeam1[index=1;pos=(1,2);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(6,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(2,2);moving_rule=UL]--|--DragonLord[index=0;pos=(3,5)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0001--FlyTeam1[index=1;pos=(2,4);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(7,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(1,1);moving_rule=UL]--|--DragonLord[index=0;pos=(5,1)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0002--FlyTeam1[index=1;pos=(3,6);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(8,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(0,0);moving_rule=UL]--|--DragonLord[index=0;pos=(5,1)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+MSG: GroundTeam at (1,0) got blocked when moving L to (1,-1)
+MSG: GroundTeam moved to the opposite direction R to (1,1)
+MSG: DragonLord moved
+Step: 0003--FlyTeam1[index=1;pos=(4,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(9,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(1,1);moving_rule=UL]--|--DragonLord[index=0;pos=(5,3)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (5,9) got blocked when moving R to (5,10)
+MSG: FlyTeam1 moved to the opposite direction L to (5,8)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (9,4) got blocked when moving D to (10,4)
+MSG: FlyTeam2 moved to the opposite direction U to (8,4)
+MSG: GroundTeam moved
+MSG: DragonLord moved
+MSG: SD1 created at (5,3)
+Step: 0004--FlyTeam1[index=1;pos=(5,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(8,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(0,0);moving_rule=UL]--|--DragonLord[index=0;pos=(3,3)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (6,9) got blocked when moving R to (6,10)
+MSG: FlyTeam1 moved to the opposite direction L to (6,8)
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+MSG: GroundTeam at (1,0) got blocked when moving L to (1,-1)
+MSG: GroundTeam moved to the opposite direction R to (1,1)
+MSG: GroundTeam eliminated due to being stuck for 3 similar patterns!
+MSG: DragonLord moved
+MSG: SmartDragon moved
+Step: 0005--FlyTeam1[index=1;pos=(6,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(9,5);moving_rule=LDR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(3,3)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (7,9) got blocked when moving R to (7,10)
+MSG: FlyTeam1 moved to the opposite direction L to (7,8)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (9,4) got blocked when moving D to (10,4)
+MSG: FlyTeam2 moved to the opposite direction U to (8,4)
+MSG: FlyTeam2 eliminated due to being stuck for 3 similar patterns!
+MSG: FlyTeam2 meets GroundTeam
+MSG: DragonLord moved
+MSG: SmartDragon moved
+Step: 0006--FlyTeam1[index=1;pos=(7,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(-1,-1);moving_rule=LDR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(9,8)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (8,9) got blocked when moving R to (8,10)
+MSG: FlyTeam1 moved to the opposite direction L to (8,8)
+MSG: DragonLord moved
+MSG: SmartDragon moved
+Step: 0007--FlyTeam1[index=1;pos=(8,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(-1,-1);moving_rule=LDR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(9,9)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (9,9) got blocked when moving R to (9,10)
+MSG: FlyTeam1 moved to the opposite direction L to (9,8)
+MSG: DragonLord moved
+MSG: SmartDragon moved
+Step: 0008--FlyTeam1[index=1;pos=(9,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(-1,-1);moving_rule=LDR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(9,10)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (9,9) got blocked when moving D to (10,9)
+MSG: FlyTeam1 moved to the opposite direction U to (8,9)
+MSG: FlyTeam1 at (8,9) got blocked when moving R to (8,10)
+MSG: FlyTeam1 moved to the opposite direction L to (8,8)
+MSG: DragonLord moved
+MSG: ArrayMovingObjects is full. Cannot create more SmartDragon
+MSG: SmartDragon moved
+Step: 0009--FlyTeam1[index=1;pos=(8,8);moving_rule=RDR]--|--FlyTeam2[index=2;pos=(-1,-1);moving_rule=LDR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(9,9)]
+-------------------------------------------------------------------------------------------------------------------
+The warrior lost the battle!
+-------------------------------------------------------!END!-------------------------------------------------------
+
+
+----- Sample Testcase 20 -----
+------------------------------------------------------!BEGIN!------------------------------------------------------
+Step:START--FlyTeam1[index=1;pos=(0,0);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(3,4);moving_rule=URR]--|--GroundTeam[index=3;pos=(7,7);moving_rule=UL]--|--DragonLord[index=0;pos=(4,4)]
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0000--FlyTeam1[index=1;pos=(2,1);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(2,6);moving_rule=URR]--|--GroundTeam[index=3;pos=(6,6);moving_rule=UL]--|--DragonLord[index=0;pos=(5,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0001--FlyTeam1[index=1;pos=(4,2);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(1,8);moving_rule=URR]--|--GroundTeam[index=3;pos=(5,5);moving_rule=UL]--|--DragonLord[index=0;pos=(6,3)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 encouters DragonLord
+Step: 0002--FlyTeam1[index=1;pos=(6,3);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(1,8);moving_rule=URR]--|--GroundTeam[index=3;pos=(5,5);moving_rule=UL]--|--DragonLord[index=0;pos=(6,3)]
+FlyTeam1 defeated the DragonLord!
+-------------------------------------------------------!END!-------------------------------------------------------
+
+
+----- Sample Testcase 21 -----
+------------------------------------------------------!BEGIN!------------------------------------------------------
+Step:START--FlyTeam1[index=1;pos=(0,0);moving_rule=RD]--|--FlyTeam2[index=2;pos=(0,0);moving_rule=DR]--|--GroundTeam[index=3;pos=(0,0);moving_rule=UL]--|--DragonLord[index=0;pos=(4,4)]
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 meets FlyTeam1
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+MSG: GroundTeam at (1,0) got blocked when moving L to (1,-1)
+MSG: GroundTeam moved to the opposite direction R to (1,1)
+MSG: GroundTeam meets FlyTeam1
+MSG: GroundTeam meets FlyTeam2
+MSG: DragonLord moved
+Step: 0000--FlyTeam1[index=1;pos=(1,1);moving_rule=RD]--|--FlyTeam2[index=2;pos=(1,1);moving_rule=DR]--|--GroundTeam[index=3;pos=(1,1);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 meets FlyTeam1
+MSG: GroundTeam moved
+MSG: GroundTeam encouters DragonLord
+MSG: GroundTeam trapped DragonLord for 3 turns
+Step: 0001--FlyTeam1[index=1;pos=(2,2);moving_rule=RD]--|--FlyTeam2[index=2;pos=(2,2);moving_rule=DR]--|--GroundTeam[index=3;pos=(0,0);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 meets FlyTeam1
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+MSG: GroundTeam at (1,0) got blocked when moving L to (1,-1)
+MSG: GroundTeam moved to the opposite direction R to (1,1)
+Step: 0002--FlyTeam1[index=1;pos=(3,3);moving_rule=RD]--|--FlyTeam2[index=2;pos=(3,3);moving_rule=DR]--|--GroundTeam[index=3;pos=(1,1);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 meets FlyTeam1
+MSG: GroundTeam moved
+MSG: GroundTeam eliminated due to being stuck for 3 similar patterns!
+MSG: DragonLord escaped the trap! Failed to move GroundTeam - eliminated!
+Step: 0003--FlyTeam1[index=1;pos=(4,4);moving_rule=RD]--|--FlyTeam2[index=2;pos=(4,4);moving_rule=DR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (4,4) got blocked when moving R to (4,5)
+MSG: FlyTeam1 moved to the opposite direction L to (4,3)
+MSG: FlyTeam1 at (4,3) got blocked when moving D to (5,3)
+MSG: FlyTeam1 moved to the opposite direction U to (3,3)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (4,4) got blocked when moving D to (5,4)
+MSG: FlyTeam2 moved to the opposite direction U to (3,4)
+MSG: FlyTeam2 at (3,4) got blocked when moving R to (3,5)
+MSG: FlyTeam2 moved to the opposite direction L to (3,3)
+MSG: FlyTeam2 meets FlyTeam1
+MSG: DragonLord moved
+Step: 0004--FlyTeam1[index=1;pos=(3,3);moving_rule=RD]--|--FlyTeam2[index=2;pos=(3,3);moving_rule=DR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 meets FlyTeam1
+MSG: DragonLord moved
+Step: 0005--FlyTeam1[index=1;pos=(4,4);moving_rule=RD]--|--FlyTeam2[index=2;pos=(4,4);moving_rule=DR]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=UL]--|--DragonLord[index=0;pos=(0,0)]
+-------------------------------------------------------------------------------------------------------------------
+The warrior lost the battle!
+-------------------------------------------------------!END!-------------------------------------------------------
+
+
+----- Sample Testcase 22 -----
+------------------------------------------------------!BEGIN!------------------------------------------------------
+Step:START--FlyTeam1[index=1;pos=(2,3);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(7,7);moving_rule=ULL]--|--GroundTeam[index=3;pos=(5,5);moving_rule=ULU]--|--DragonLord[index=0;pos=(0,0)]
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (6,7) got blocked when moving L to (6,6)
+MSG: FlyTeam2 moved to the opposite direction R to (6,8)
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0000--FlyTeam1[index=1;pos=(4,4);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(6,7);moving_rule=ULL]--|--GroundTeam[index=3;pos=(3,4);moving_rule=ULU]--|--DragonLord[index=0;pos=(3,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: DragonLord moved
+Step: 0001--FlyTeam1[index=1;pos=(6,5);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(5,5);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,3);moving_rule=ULU]--|--DragonLord[index=0;pos=(1,0)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (6,5) got blocked when moving R to (6,6)
+MSG: FlyTeam1 moved to the opposite direction L to (6,4)
+MSG: FlyTeam1 at (6,4) got blocked when moving D to (7,4)
+MSG: FlyTeam1 moved to the opposite direction U to (5,4)
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,2) got blocked when moving U to (-1,2)
+MSG: GroundTeam moved to the opposite direction D to (1,2)
+MSG: DragonLord moved
+MSG: GroundTeam encouters DragonLord
+MSG: GroundTeam trapped DragonLord for 3 turns
+Step: 0002--FlyTeam1[index=1;pos=(6,4);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(4,3);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,2);moving_rule=ULU]--|--DragonLord[index=0;pos=(1,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam2 moved
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,1) got blocked when moving U to (-1,1)
+MSG: GroundTeam moved to the opposite direction D to (1,1)
+Step: 0003--FlyTeam1[index=1;pos=(8,5);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(3,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,1);moving_rule=ULU]--|--DragonLord[index=0;pos=(1,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (8,5) got blocked when moving R to (8,6)
+MSG: FlyTeam1 moved to the opposite direction L to (8,4)
+MSG: FlyTeam1 at (9,4) got blocked when moving D to (10,4)
+MSG: FlyTeam1 moved to the opposite direction U to (8,4)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (2,0) got blocked when moving L to (2,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (2,1)
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+Step: 0004--FlyTeam1[index=1;pos=(8,4);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(2,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,0);moving_rule=ULU]--|--DragonLord[index=0;pos=(1,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (8,5) got blocked when moving D to (9,5)
+MSG: FlyTeam1 moved to the opposite direction U to (7,5)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (1,0) got blocked when moving L to (1,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (1,1)
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving L to (0,-1)
+MSG: GroundTeam moved to the opposite direction R to (0,1)
+MSG: GroundTeam at (0,1) got blocked when moving U to (-1,1)
+MSG: GroundTeam moved to the opposite direction D to (1,1)
+MSG: GroundTeam meets FlyTeam2
+MSG: DragonLord escaped the trap! GroundTeam transferred to (1,1)
+Step: 0005--FlyTeam1[index=1;pos=(8,5);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(1,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,1);moving_rule=ULU]--|--DragonLord[index=0;pos=(1,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (8,5) got blocked when moving R to (8,6)
+MSG: FlyTeam1 moved to the opposite direction L to (8,4)
+MSG: FlyTeam1 at (9,4) got blocked when moving D to (10,4)
+MSG: FlyTeam1 moved to the opposite direction U to (8,4)
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (0,0) got blocked when moving L to (0,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (0,1)
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving U to (-1,0)
+MSG: GroundTeam moved to the opposite direction D to (1,0)
+MSG: DragonLord moved
+Step: 0006--FlyTeam1[index=1;pos=(8,4);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(0,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(1,0);moving_rule=ULU]--|--DragonLord[index=0;pos=(3,8)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam1 moved
+MSG: FlyTeam1 at (8,5) got blocked when moving D to (9,5)
+MSG: FlyTeam1 moved to the opposite direction U to (7,5)
+MSG: FlyTeam1 eliminated due to being stuck for 3 similar patterns!
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (0,1) got blocked when moving U to (-1,1)
+MSG: FlyTeam2 moved to the opposite direction D to (1,1)
+MSG: FlyTeam2 at (1,0) got blocked when moving L to (1,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (1,1)
+MSG: GroundTeam moved
+MSG: GroundTeam at (0,0) got blocked when moving L to (0,-1)
+MSG: GroundTeam moved to the opposite direction R to (0,1)
+MSG: GroundTeam at (0,1) got blocked when moving U to (-1,1)
+MSG: GroundTeam moved to the opposite direction D to (1,1)
+MSG: GroundTeam eliminated due to being stuck for 3 similar patterns!
+MSG: GroundTeam meets FlyTeam1
+MSG: DragonLord moved
+MSG: SD1 created at (3,8)
+Step: 0007--FlyTeam1[index=1;pos=(-1,-1);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(1,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=ULU]--|--DragonLord[index=0;pos=(2,2)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (0,0) got blocked when moving L to (0,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (0,1)
+MSG: DragonLord moved
+MSG: SmartDragon moved
+Step: 0008--FlyTeam1[index=1;pos=(-1,-1);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(0,1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=ULU]--|--DragonLord[index=0;pos=(2,1)]
+-------------------------------------------------------------------------------------------------------------------
+MSG: FlyTeam2 moved
+MSG: FlyTeam2 at (0,1) got blocked when moving U to (-1,1)
+MSG: FlyTeam2 moved to the opposite direction D to (1,1)
+MSG: FlyTeam2 at (1,0) got blocked when moving L to (1,-1)
+MSG: FlyTeam2 moved to the opposite direction R to (1,1)
+MSG: FlyTeam2 eliminated due to being stuck for 3 similar patterns!
+MSG: FlyTeam2 meets FlyTeam1
+Step: 0009--FlyTeam1[index=1;pos=(-1,-1);moving_rule=RDD]--|--FlyTeam2[index=2;pos=(-1,-1);moving_rule=ULL]--|--GroundTeam[index=3;pos=(-1,-1);moving_rule=ULU]--|--DragonLord[index=0;pos=(2,1)]
+The warrior lost the battle!
+-------------------------------------------------------!END!-------------------------------------------------------
