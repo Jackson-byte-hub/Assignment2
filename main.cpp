@@ -68,10 +68,10 @@ public:
         cout << arr_mv_objs->str() << endl;
 
         delete arr_mv_objs;
-        delete flyteam1;
-        delete flyteam2;
-        delete groundteam;
-        delete dragonlord;
+        // delete flyteam1;
+        // delete flyteam2;
+        // delete groundteam;
+        // delete dragonlord;
         delete map;
     }
 
@@ -167,6 +167,7 @@ public:
 int main(int argc, const char * argv[]) {
     TestDragonWar::satc_01();
     TestDragonWar::satc_02();
+    TestDragonWar::satc_03();
     TestDragonWar::satc_19();
     TestDragonWar::satc_20();
     TestDragonWar::satc_21();

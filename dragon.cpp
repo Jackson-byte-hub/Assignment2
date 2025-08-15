@@ -193,7 +193,7 @@ Warrior::Warrior(int index, const Position &pos, Map *map, const string &name, i
 }
 
 Warrior::~Warrior() {
-    delete bag;  // Clean up memory
+    delete bag;  // Clean memory
 }
 
 int Warrior::getHp() const {
@@ -216,6 +216,7 @@ BaseBag* Warrior::getBag() const {
     return bag;
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 /// FlyTeam
 ////////////////////////////////////////////////////////////////////////
@@ -231,11 +232,11 @@ Position FlyTeam::getNextPosition() {
     int r = pos.getRow();
     int c = pos.getCol();
     switch (dir) {
-        case 'L': c--; break; // Left
-        case 'R': c++; break; // Right
-        case 'U': r--; break; // Up
-        case 'D': r++; break; // Down
-        default:  return Position::npos; // Invalid char
+        case 'L': c--; break;
+        case 'R': c++; break;
+        case 'U': r--; break;
+        case 'D': r++; break;
+        default:  return Position::npos;
     }
 
     // Advance to next move in the rule (wrap around)
@@ -449,6 +450,13 @@ string DragonLord::str() const {
 ////////////////////////////////////////////////////////////////////////
 /// Smart Dragon
 ////////////////////////////////////////////////////////////////////////
+
+// Default
+Position SmartDragon::getNextPosition() {
+    return Position::npos;
+}
+
+// spawnSmartDragon
 void DragonLord::spawnSmartDragon(const Position& spawnPos) {
     if (!arr_mv_objs || arr_mv_objs->isFull()) return;
 
@@ -522,6 +530,7 @@ void DragonLord::spawnSmartDragon(const Position& spawnPos) {
 
     if (newDragon) arr_mv_objs->add(newDragon);
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 /// ArrayMovingObject
@@ -851,110 +860,144 @@ bool DragonWarriorsProgram::isStop() const {
 }
 
 void DragonWarriorsProgram::run(bool verbose) {
+    if (groundteam) {
+        groundteam->setTrapTurns(3);
+    }
+
     for (int istep = 0; istep < config->getNumSteps(); ++istep) {
-        for (int i = 0; i < arr_mv_objs->size(); ++i) {
-            arr_mv_objs->get(i)->move();
 
-            Warrior* wr = dynamic_cast<Warrior*>(arr_mv_objs->get(i));
-            if (wr) {
+        auto doWarriorTurn = [&](Warrior* wr, const string& name) {
+            if (!wr) return;
 
-                // === Check Dragon Lord encounter ===
-                if (wr->getCurrentPosition().isEqual(dragonlord->getCurrentPosition())) {
+            // Use pending item from previous turn
+            if (wr->hasPendingItemUse()) {
+                BaseItem* item = wr->getBag()->getUsableItem();
+                if (item) {
+                    item->use(wr);
+                    delete item;
+                }
+                wr->setPendingItemUse(false);
+            }
+
+            if (verbose) cout << "MSG: " << name << " moved" << endl;
+            wr->move();
+
+            // === Check Dragon Lord encounter ===
+            if (wr->getCurrentPosition().isEqual(dragonlord->getCurrentPosition())) {
+                if (auto ft = dynamic_cast<FlyTeam*>(wr)) {
+                    if (ft->attack(dragonlord)) {
+                        if (verbose) printStep(istep);
+                        printResult();
+                        return; // game ends
+                    }
+                } else if (auto gt = dynamic_cast<GroundTeam*>(wr)) {
+                    if (verbose) cout << "MSG: " << name << " encouters DragonLord" << endl;
+                    dragonlord->setTrapped(gt->getTrapTurns());
+                }
+            }
+
+            // === SmartDragon combat ===
+            for (int j = 0; j < arr_mv_objs->size(); ++j) {
+                SmartDragon* sd = dynamic_cast<SmartDragon*>(arr_mv_objs->get(j));
+                if (!sd) continue;
+                if (!sd->getCurrentPosition().isEqual(wr->getCurrentPosition())) continue;
+
+                bool sdDefeated = false;
+                switch (sd->getType()) {
+                    case SD1: sdDefeated = (wr->getDamage() >= sd->getDamage()); break;
+                    case SD2: sdDefeated = (wr->getDamage() > sd->getDamage()); break;
+                    case SD3: sdDefeated = (wr->getDamage() >= sd->getDamage()); break;
+                }
+
+                if (sdDefeated) {
+                    BaseItem* loot = nullptr;
+                    if (sd->getType() == SD3) {
+                        if (wr == groundteam) {
+                            loot = new TrapEnhancer();
+                        } else if (wr == flyteam1) {
+                            loot = new HealingHerb();
+                        } else if (wr == flyteam2) {
+                            loot = new DragonScale();
+                        }
+                    } else {
+                        loot = sd->drop(wr);
+                    }
+
+                    if (loot && wr->getBag() && wr->getBag()->insert(loot)) {
+                        wr->setPendingItemUse(true);
+                        if (verbose) cout << wr->getName() << " obtained " << typeid(*loot).name() << "\n";
+                    } else {
+                        delete loot;
+                    }
+
+                    arr_mv_objs->removeAt(j);
+                    j--;
+                } else {
+                    wr->setHp(wr->getHp() - 100);
+                    if (wr->getHp() <= 0) {
+                        for (int k = 0; k < arr_mv_objs->size(); ++k) {
+                            if (arr_mv_objs->get(k) == wr) {
+                                arr_mv_objs->removeAt(k);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+
+        // ---- Movement Order ----
+        doWarriorTurn(flyteam1, "FlyTeam1");
+        if (isStop()) { if (verbose) printStep(istep); printResult(); return; }
+
+        doWarriorTurn(flyteam2, "FlyTeam2");
+        if (isStop()) { if (verbose) printStep(istep); printResult(); return; }
+
+        doWarriorTurn(groundteam, "GroundTeam");
+        if (isStop()) { if (verbose) printStep(istep); printResult(); return; }
+
+        // DragonLord turn
+        if (dragonlord) {
+            if (verbose) cout << "MSG: DragonLord moved" << endl;
+            dragonlord->move();
+            for (int j = 0; j < arr_mv_objs->size(); ++j) {
+                Warrior* wr = dynamic_cast<Warrior*>(arr_mv_objs->get(j));
+                if (wr && wr->getCurrentPosition().isEqual(dragonlord->getCurrentPosition())) {
                     if (auto ft = dynamic_cast<FlyTeam*>(wr)) {
                         if (ft->attack(dragonlord)) {
                             if (verbose) printStep(istep);
                             printResult();
-                            return; // game ends
+                            return;
                         }
-                    }
-                    else if (auto gt = dynamic_cast<GroundTeam*>(wr)) {
-                        dragonlord->setTrapped(gt->getTrapTurns());
-
-                        // DragonLord::Move will do the post trap
-
-                        // === Check SmartDragon combat ===
-                        for (int j = 0; j < arr_mv_objs->size(); ++j) {
-                            SmartDragon* sd = dynamic_cast<SmartDragon*>(arr_mv_objs->get(j));
-                            if (sd && sd->getCurrentPosition().isEqual(wr->getCurrentPosition())) {
-
-                                bool sdDefeated = false;
-
-                                switch (sd->getType()) {
-                                    case SD1:
-                                        if (wr->getDamage() >= sd->getDamage()) {
-                                            sdDefeated = true;
-                                        } else {
-                                            wr->setHp(wr->getHp() - 100);
-                                            if (wr->getHp() <= 0) {
-                                                arr_mv_objs->removeAt(i);
-                                                i--;
-                                            }
-                                        }
-                                        break;
-
-                                    case SD2:
-                                        if (wr->getDamage() > sd->getDamage()) {
-                                            sdDefeated = true;
-                                        } else {
-                                            wr->setHp(wr->getHp() - 100);
-                                            if (wr->getHp() <= 0) {
-                                                arr_mv_objs->removeAt(i);
-                                                i--;
-                                            }
-                                        }
-                                        break;
-
-                                    case SD3:
-                                        if (wr->getDamage() >= sd->getDamage()) {
-                                            sdDefeated = true;
-                                        } else {
-                                            wr->setHp(wr->getHp() - 100);
-                                            if (wr->getHp() <= 0) {
-                                                arr_mv_objs->removeAt(i);
-                                                i--;
-                                            }
-                                        }
-                                        break;
-                                }
-
-                                if (sdDefeated) {
-                                    BaseItem* loot = nullptr;
-
-                                    if (sd->getType() == SD3) {
-                                        SmartDragonSD3* sd3 = dynamic_cast<SmartDragonSD3*>(sd);
-                                        if (sd3) loot = sd3->Drop(wr);
-                                    } else {
-                                        loot = sd->drop(wr);
-                                    }
-
-                                    if (loot && wr->getBag() && wr->getBag()->insert(loot)) {
-                                        cout << wr->getName() << " obtained " << typeid(*loot).name() << endl;
-                                    } else {
-                                        delete loot;
-                                    }
-
-                                    arr_mv_objs->removeAt(j);
-                                    j--;
-                                }
-                            }
-                        }
-                    }
-
-                    // Stop conditions
-                    if (isStop()) {
-                        if (verbose) printStep(istep);
-                        printResult();
-                        return;
-                    }
-
-                    if (verbose) {
-                        printStep(istep);
                     }
                 }
             }
-            printResult();
+        }
+
+        // SmartDragon turn
+        for (int i = 0; i < arr_mv_objs->size(); ++i) {
+            SmartDragon* sd = dynamic_cast<SmartDragon*>(arr_mv_objs->get(i));
+            if (!sd) continue;
+            sd->move();
+            for (int j = 0; j < arr_mv_objs->size(); ++j) {
+                Warrior* wr = dynamic_cast<Warrior*>(arr_mv_objs->get(j));
+                if (wr && wr->getCurrentPosition().isEqual(sd->getCurrentPosition())) {
+                    wr->setHp(wr->getHp() - sd->getDamage());
+                    if (wr->getHp() <= 0) {
+                        arr_mv_objs->removeAt(j);
+                        if (j < i) i--;
+                        j--;
+                    }
+                }
+            }
+        }
+
+        if (verbose) {
+            printStep(istep);
         }
     }
+    printResult();
 }
 
 

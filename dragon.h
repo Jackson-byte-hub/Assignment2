@@ -121,6 +121,7 @@ protected:
     int hp;
     int damage;
     BaseBag* bag;
+    bool pending_item = false;
 public:
     Warrior(int index, const Position & pos, Map * map,
             const string & name, int hp, int damage);
@@ -133,7 +134,10 @@ public:
     void setDamage(int dmg);
     // getBag()
     BaseBag* getBag() const;
+    void setBag(BaseBag* newBag) { bag = newBag; }
     string getName() const { return name; }
+    bool hasPendingItemUse() const { return pending_item; }
+    void setPendingItemUse(bool val) { pending_item = val; }
 };
 
 // ——— FlyTeam  ———
@@ -162,7 +166,7 @@ private:
     // TODO
     string moving_rule;
     int moving_index;
-    int trap_turns;
+    int trap_turns = 3;
 public:
     GroundTeam(int index, const string & moving_rule,
         const Position & pos, Map * map, int hp, int damage);
@@ -269,13 +273,14 @@ protected:
     MovingObject* target;      // The object this Smart Dragon targets
 
 public:
+    virtual Position getNextPosition() override;
+
+
     DragonType getType() const { return smartdragon_type; }
     SmartDragon(int index, const Position &init_pos, Map *map,
                 DragonType type, MovingObject *target, int damage)
         : MovingObject(index, init_pos, map, "SmartDragon"),
           smartdragon_type(type), damage(damage), item(nullptr), target(target) {}
-
-    virtual Position getNextPosition() = 0; // pure virtual
     virtual void move() {
         Position next = getNextPosition();
         if (next != Position::npos) {
@@ -456,9 +461,11 @@ class TeamBag : public BaseBag {
 public:
     TeamBag(Warrior* w, int)
         : BaseBag(w, (dynamic_cast<FlyTeam*>(w) ? 5 : 7)) {
-        // capacity is set automatically: 5 for FlyTeam, 7 for GroundTeam
+        // FlyTeam: 5, GroundTeam: 7
     }
 };
+
+
 // ...................
 
 // ——— ArrayMovingObject ———
