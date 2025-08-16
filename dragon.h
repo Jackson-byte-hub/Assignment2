@@ -167,6 +167,8 @@ private:
     string moving_rule;
     int moving_index;
     int trap_turns = 3;
+    int Groundteam_stuckCounter = 0;
+    string lastStuckPattern;
 public:
     GroundTeam(int index, const string & moving_rule,
         const Position & pos, Map * map, int hp, int damage);

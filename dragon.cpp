@@ -302,31 +302,66 @@ Position GroundTeam::getNextPosition() {
     int r = pos.getRow();
     int c = pos.getCol();
     switch (dir) {
-        case 'L': c--; break; // Left
-        case 'R': c++; break; // Right
-        case 'U': r--; break; // Up
-        case 'D': r++; break; // Down
-        default:  return Position::npos; // Invalid char
+        case 'L': c--; break;
+        case 'R': c++; break;
+        case 'U': r--; break;
+        case 'D': r++; break;
+        default:  return Position::npos;
     }
 
-    // Advance to next move in the rule (wrap around)
-    moving_index = (moving_index + 1) % moving_rule.size();
-
     Position next(r, c);
-    if (map && map->isValid(next, this))
+
+    // If valid → normal move
+    if (map && map->isValid(next, this)) {
+        moving_index = (moving_index + 1) % moving_rule.size();
+        Groundteam_stuckCounter = 0; // reset stuck state
+        lastStuckPattern.clear();
         return next;
+    }
+
+    // --- Blocked → try opposite ---
+    cout << "MSG: GroundTeam at " << pos.str()
+         << " got blocked when moving " << dir
+         << " to " << next.str() << "\n";
+
+    char opposite;
+    switch (dir) {
+        case 'L': opposite = 'R'; break;
+        case 'R': opposite = 'L'; break;
+        case 'U': opposite = 'D'; break;
+        case 'D': opposite = 'U'; break;
+        default: return Position::npos;
+    }
+
+    r = pos.getRow();
+    c = pos.getCol();
+    switch (opposite) {
+        case 'L': c--; break;
+        case 'R': c++; break;
+        case 'U': r--; break;
+        case 'D': r++; break;
+    }
+    Position reversed(r, c);
+
+    if (map && map->isValid(reversed, this)) {
+        cout << "MSG: GroundTeam moved to the opposite direction "
+             << opposite << " to " << reversed.str() << "\n";
+
+        moving_index = (moving_index + 1) % moving_rule.size();
+        return reversed;
+    }
 
     return Position::npos;
 }
 
+
 void GroundTeam::move() {
     for (size_t i = 0; i < moving_rule.size(); i++) {
         Position next = getNextPosition();
-        if (next != Position::npos) {
-            pos = next;
-        }
+        if (next != Position::npos) pos = next;
     }
 }
+
 
 string GroundTeam::str() const {
     return "GroundTeam[index=" + to_string(index) +
@@ -527,8 +562,10 @@ void DragonLord::spawnSmartDragon(const Position& spawnPos) {
         newDragon = new SmartDragonSD2(arr_mv_objs->size(), spawnPos, map, SD2, flyteam2, 100);
     else
         newDragon = new SmartDragonSD3(arr_mv_objs->size(), spawnPos, map, SD3, groundteam, 100);
-
+    cout << typeToCreate << " created at (" << flyteam1->getCurrentPosition().getRow() << "," << flyteam1->
+            getCurrentPosition().getCol() << ")" << endl;
     if (newDragon) arr_mv_objs->add(newDragon);
+
 }
 
 
@@ -553,7 +590,9 @@ bool ArrayMovingObject::isFull() const {
 }
 
 bool ArrayMovingObject::add(MovingObject* mv_obj) {
-    if (isFull()) return false;
+    if (isFull())
+        cout << "MSG: ArrayMovingObjects is full. Cannot create more SmartDragon" << endl;
+            return false;
     arr_mv_objs[count++] = mv_obj;
     return true;
 }
